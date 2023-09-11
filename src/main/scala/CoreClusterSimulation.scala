@@ -80,8 +80,7 @@ abstract class Simulator(logging: Boolean = false) {
 
   def afterDelay(delay: Double)(block: => Unit) {
     val item = WorkItem(currentTime + delay, () => block)
-    agenda.enqueue(item)
-    // log("inserted new WorkItem into agenda to run at time " + (currentTime + delay))
+    agenda.enqueue(item) 
   }
 
   private def next() {
@@ -227,9 +226,7 @@ class ClusterSimulator(val cellState: CellState,
       .format(workload.numJobs, workload.name))
     var i = 0
     workload.getJobs.foreach(job => {
-      i += 1
-      // println("Prefilling %d %s job id - %d."
-      //         .format(i, workload.name, job.id))
+      i += 1 
       if (job.cpusPerTask > cellState.cpusPerMachine ||
         job.memPerTask > cellState.memPerMachine) {
         println(("IGNORING A JOB REQUIRING %f CPU & %f MEM PER TASK " +
@@ -237,9 +234,7 @@ class ClusterSimulator(val cellState: CellState,
           .format(job.cpusPerTask, job.memPerTask,
             cellState.cpusPerMachine, cellState.memPerMachine))
       } else {
-        val claimDeltas = prefillScheduler.scheduleJob(job, cellState)
-        // assert(job.numTasks == claimDeltas.length,
-        //        "Prefill job failed to schedule.")
+        val claimDeltas = prefillScheduler.scheduleJob(job, cellState) 
         cellState.scheduleEndEvents(claimDeltas)
       }
     })
@@ -269,15 +264,7 @@ class ClusterSimulator(val cellState: CellState,
         // Schedule the task to get submitted to its scheduler at its
         // submission time.
 
-        // assert(job.cpusPerTask * job.numTasks <= cellState.totalCpus + 0.000001 &&
-        //        job.memPerTask * job.numTasks <= cellState.totalMem + 0.000001,
-        //        ("The cell (%f cpus, %f mem) is not big enough to hold job %d " +
-        //        "all at once which requires %f cpus and %f mem in total.")
-        //        .format(cellState.totalCpus,
-        //                cellState.totalMem,
-        //                job.id,
-        //                job.cpusPerTask * job.numTasks,
-        //                job.memPerTask * job.numTasks))
+        
         if (job.cpusPerTask * job.numTasks > cellState.totalCpus + 0.000001 ||
           job.memPerTask * job.numTasks > cellState.totalMem + 0.000001) {
           println(("WARNING: The cell (%f cpus, %f mem) is not big enough " +
@@ -301,12 +288,9 @@ class ClusterSimulator(val cellState: CellState,
 
   // If more than one scheduler is assigned a workload, round robin across them.
   def getSchedulerForWorkloadName(workloadName: String): Option[Scheduler] = {
-    workloadToSchedulerMap.get(workloadName).map(schedulerNames => {
-      // println("schedulerNames is %s".format(schedulerNames.mkString(" ")))
+    workloadToSchedulerMap.get(workloadName).map(schedulerNames => { 
       roundRobinCounter += 1
-      val name = schedulerNames(roundRobinCounter % schedulerNames.length)
-      // println("Assigning job from workload %s to scheduler %s"
-      //         .format(workloadName, name))
+      val name = schedulerNames(roundRobinCounter % schedulerNames.length) 
       schedulers(name)
     })
   }
@@ -392,15 +376,7 @@ class ClusterSimulator(val cellState: CellState,
   val powerShutting = 110
 
   def totalEnergyConsumed: Double = {
-    /*
-    //Old way, all machines homogeneous in terms of energy consumption
-    val energyOn = (sumCpuUtilization.toDouble / numMonitoringMeasurements.toDouble) * powerPerCpuOn * runtime
-    val energyIdle = ( ((sumMachinesOn * cellState.cpusPerMachine) - (sumCpuUtilization)).toDouble / numMonitoringMeasurements.toDouble) * powerPerCpuIdle * runtime
-    val energyOff = (sumMachinesOff.toDouble / numMonitoringMeasurements.toDouble) * powerTurnedOff * runtime
-    val energyTurnOn = (sumMachinesTurningOn.toDouble / numMonitoringMeasurements.toDouble) * powerBooting * runtime
-    val energyTurnOff = (sumMachinesTurningOff.toDouble / numMonitoringMeasurements.toDouble) * powerShutting * runtime
-    energyOn + energyIdle + energyOff + energyTurnOff + energyTurnOn
-    */
+   
     val avgPowerPerMachine = new Array[Double](cellState.numMachines)
     for (machineID <- 0 until cellState.numMachines) {
       avgPowerPerMachine(machineID) = totalPower(machineID).sum / totalPower(machineID).length
@@ -409,12 +385,7 @@ class ClusterSimulator(val cellState: CellState,
   }
 
   def totalCurrentEnergyConsumed: Double = {
-    /*
-    //Old way, all machines homogeneous in terms of energy consumption
-    val energyOn = (sumCpuUtilization.toDouble / numMonitoringMeasurements.toDouble) * powerPerCpuOn * runtime
-    val energyIdle = ( ((cellState.numMachines * cellState.cpusPerMachine * numMonitoringMeasurements) - (sumCpuUtilization)).toDouble / numMonitoringMeasurements.toDouble) * powerPerCpuIdle * runtime
-    energyOn + energyIdle
-    */
+   
     val avgPowerPerMachine = new Array[Double](cellState.numMachines)
     for (machineID <- 0 until cellState.numMachines) {
       avgPowerPerMachine(machineID) = currentPower(machineID).sum / currentPower(machineID).length
@@ -585,16 +556,10 @@ class ClusterSimulator(val cellState: CellState,
         interArrival(i-1) = (pastTuples(i)._1 - pastTuples(i-1)._1)
       }
       val interArrivalMean = interArrival.sum / interArrival.size.toDouble
-      //val chosenStrategy = this.asInstanceOf[DynamicSimulator].strategies(Random.nextInt(this.asInstanceOf[DynamicSimulator].strategies.length))
       val chosenStrategy = SimpleNN.classify(cellState.totalOccupiedCpus / cellState.totalCpus, interArrivalMean)
-      //println("strategy: "+chosenStrategy+" inter: "+interArrivalMean )
-      //val chosenStrategy = "Mesos"
+
       schedulers.values.foreach(scheduler => scheduler.asInstanceOf[DynamicScheduler].chooseStrategy(chosenStrategy))
-      /*if(numMonitoringMeasurements % 100 == 0){
-        println("Changes: "+ schedulers.values.head.asInstanceOf[DynamicScheduler].iter)
-      }*/
-      //schedulers.values.foreach(scheduler => scheduler.asInstanceOf[DynamicScheduler].markedStrategy=chosenStrategy)
-    }
+   }
 
   }
 
@@ -651,35 +616,17 @@ class ClusterSimulator(val cellState: CellState,
       }
       totalPower(machineID)(numMonitoringMeasurements.toInt) = totalMachinePower
       currentPower(machineID)(numMonitoringMeasurements.toInt) = currentMachinePower
-    }
-    //println(this.currentTime)
+    } 
     if(this.isInstanceOf[DynamicSimulator]){
       measuredSchedulingStrategy = measuredSchedulingStrategy :+ schedulers.values.head.asInstanceOf[DynamicScheduler].chosenStrategy.name
-      changeResourceManager
-      //println("post " + this.currentTime.toString)
+      changeResourceManager 
     }
-    numMonitoringMeasurements += 1
-    //totalMachinePowerStates = totalMachinePowerStates :+ cellState.machinePowerState
+    numMonitoringMeasurements += 1 
     log("Avg cpu utilization (adding measurement %d of %f): %f."
       .format(numMonitoringMeasurements,
         cellState.totalOccupiedCpus,
         avgCpuUtilization))
-    //Temporary: print utilization throughout the day.
-    // if (numMonitoringMeasurements % 1000 == 0) {
-    //   println("%f - Current cluster utilization: %f %f cpu , %f %f mem"
-    //           .format(currentTime,
-    //                   cellState.totalOccupiedCpus,
-    //                   cellState.totalOccupiedCpus / cellState.totalCpus,
-    //                   cellState.totalOccupiedMem,
-    //                   cellState.totalOccupiedMem / cellState.totalMem))
-    //   println(("%f - Current cluster utilization from locked resources: " +
-    //            "%f cpu, %f mem")
-    //            .format(currentTime,
-    //                    cellState.totalLockedCpus,
-    //                    cellState.totalLockedCpus/ cellState.totalCpus,
-    //                    cellState.totalLockedMem,
-    //                    cellState.totalLockedMem / cellState.totalMem))
-    // }
+ 
     log("Avg mem utilization: %f.".format(avgMemUtilization))
     // Only schedule a monitoring event if the simulator has
     // more (non-monitoring) events to play. Else this will cause
@@ -749,13 +696,7 @@ abstract class Scheduler(val name: String,
   assert(numMachinesToBlackList >= 0)
   var pendingQueue = new collection.mutable.Queue[Job]
   // This gets set when this scheduler is added to a Simulator.
-  // TODO(andyk): eliminate this pointer and make the scheduler
-  //              more functional.
-  // TODO(andyk): Clean up these <subclass>Simulator classes
-  //              by templatizing the Scheduler class and having only
-  //              one simulator of the correct type, instead of one
-  //              simulator for each of the parent and child classes.
-  var simulator: ClusterSimulator = null
+   var simulator: ClusterSimulator = null
   var scheduling: Boolean = false
 
   // Job transaction stat counters.
@@ -793,7 +734,6 @@ abstract class Scheduler(val name: String,
   var perWorkloadWastedTimeScheduling = HashMap[String, Double]()
   var perWorkloadWastedTimeSchedulingPowering = HashMap[String, Double]()
   val randomNumberGenerator = new util.Random(Seed())
-  //var pastJobs = new mutable.LinkedHashMap[Long, Tuple3[Double, Job, Boolean]]()
   var pastJobs = new mutable.LinkedHashMap[Long, Tuple2[Double, Job]]()
   val numMachinesBlackList = numMachinesToBlackList
 
@@ -819,7 +759,6 @@ abstract class Scheduler(val name: String,
     perWorkloadWastedTimeScheduling(job.workloadName) =
       perWorkloadWastedTimeScheduling.getOrElse(job.workloadName, 0.0)
     job.lastEnqueued = simulator.currentTime
-    //pastJobs.getOrElseUpdate(job.id, (simulator.currentTime, job.copy(), false))
     pastJobs.getOrElseUpdate(job.id, addPastJob(job))
   }
 
@@ -845,9 +784,7 @@ abstract class Scheduler(val name: String,
       if (cellState.isMachineOn(mID) && (cpusAvail > 0.0001 || memAvail > 0.0001)) {
         // Create and apply a claim delta.
         assert(mID >= 0 && mID < cellState.machineSeqNums.length)
-        //TODO(andyk): Clean up semantics around taskDuration in ClaimDelta
-        //             since we want to represent offered resources, not
-        //             tasks with these deltas.
+       
         val claimDelta = new ClaimDelta(this,
           mID,
           cellState.machineSeqNums(mID),
@@ -892,38 +829,7 @@ abstract class Scheduler(val name: String,
     assert(job.memPerTask <= cellState.memPerMachine,
       "Looking for machine with %f mem, but machines only have %f mem."
         .format(job.memPerTask, cellState.memPerMachine))
-    /*
-        val claimDeltas = collection.mutable.ListBuffer[ClaimDelta]()
-
-        // Cache candidate pools in this scheduler for performance improvements.
-        var candidatePool =
-          candidatePoolCache.getOrElseUpdate(cellState.numberOfMachinesOn,
-            Array.range(0, cellState.numMachines))
-
-        var numRemainingTasks = job.unscheduledTasks
-        var remainingCandidates = math.max(0, cellState.numberOfMachinesOn - numMachinesToBlackList).toInt
-        simulator.sorter.orderResources(cellState)
-        while(numRemainingTasks > 0 && remainingCandidates > 0) {
-          val pickResult = simulator.picker.pickResource(cellState, job, candidatePool, remainingCandidates);
-          remainingCandidates = pickResult._3
-          candidatePool = pickResult._4
-          failedFindVictimAttempts += pickResult._2
-          if(pickResult._1 > -1){
-            val currMachID = pickResult._1
-            assert(currMachID >= 0 && currMachID < cellState.machineSeqNums.length)
-            val claimDelta = new ClaimDelta(this,
-              currMachID,
-              cellState.machineSeqNums(currMachID),
-              if (cellState.machinesHeterogeneous && job.workloadName == "Batch") job.taskDuration * cellState.machinesPerformance(currMachID) else job.taskDuration,
-              job.cpusPerTask,
-              job.memPerTask,
-              job = job)
-            claimDelta.apply(cellState = cellState, locked = false)
-            claimDeltas += claimDelta
-            numRemainingTasks -= 1
-          }
-        }
-        */
+  
     return simulator.picker.schedule(cellState, job, this, simulator)
   }
 
@@ -1098,14 +1004,11 @@ class CellState(val numMachines: Int,
   var machinesLoad = new Array[Int](numMachines)
   var machinesLoadFactor = populateMachinesLoadFactorMap()
   var machinesLoadOrdered = true;
-  val machinesHeterogeneous = machinesHet
-  //val machinesPerformance = Array.fill[Double](numMachines)(Random.nextDouble() * (1.5) + 0.5)
+  val machinesHeterogeneous = machinesHet 
   val machinesPerformance = machPerf
-  val machinesPerformanceOrdered = populateMachinesPerformance()
-  //val machinesSecurity = Array.fill[Int](numMachines)(Random.nextInt(6))
+  val machinesPerformanceOrdered = populateMachinesPerformance() 
   val machinesSecurity = machSec
-  val machinesSecurityMap = populateMachinesSecurity()
-  //val machinesEnergy = Array.fill[Double](numMachines)(Random.nextDouble() * (1.5) + 0.5)
+  val machinesSecurityMap = populateMachinesSecurity() 
   val machinesEnergy = machEn
 
   def populateMachinesLoadFactorMap(): HashMap[Int, Double] = {
@@ -1266,15 +1169,7 @@ class CellState(val numMachines: Int,
                       cpus: Double,
                       mem: Double,
                       locked: Boolean) = {
-    // Track the resources used by this scheduler.
-    // assert(cpus <= availableCpus + 0.000001,
-    //        ("Attempting to assign more CPUs (%f) than " +
-    //         "are currently available in CellState (%f).")
-    //        .format(cpus, availableCpus))
-    // assert(mem <= availableMem + 0.000001,
-    //        ("Attempting to assign more mem (%f) than " +
-    //         "is currently available in CellState (%f).")
-    //        .format(mem, availableMem))
+     
     assert(isMachineOn(machineID), "Assigning resources to a powered off machine")
     if (locked) {
       lockedCpus(scheduler.name) = lockedCpus.getOrElse(scheduler.name, 0.0) + cpus
@@ -1368,8 +1263,7 @@ class CellState(val numMachines: Int,
     assert(availableMemPerMachine(machineID) + mem <=
       memPerMachine + 0.000001)
     allocatedCpusPerMachine(machineID) -= cpus
-    allocatedMemPerMachine(machineID) -= mem
-    //TODO : Metemos la llamada a apagar máquinas sólo a las que han sido usadas, no a las locked
+    allocatedMemPerMachine(machineID) -= mem 
     if (!locked) {
       simulator.powerOff.powerOff(this, machineID)
       simulator.sorter.updateLoadFactor(machineID, this)
@@ -1429,8 +1323,7 @@ class CellState(val numMachines: Int,
     newCellState.numberOfMachinesOff = numberOfMachinesOff
     newCellState.numberOfMachinesOn = numberOfMachinesOn
     newCellState.numberOfMachinesTurningOff = numberOfMachinesTurningOff
-    newCellState.numberOfMachinesTurningOn = numberOfMachinesTurningOn
-    //newCellState.simulator = simulator
+    newCellState.numberOfMachinesTurningOn = numberOfMachinesTurningOn 
     newCellState
   }
 
@@ -1586,8 +1479,7 @@ case class Job(id: Long,
 
   var timeStarted: Double = 0.0
   var timeFinished: Double = 0.0
-
-  //TODO: remove this static total simulation time
+ 
   def makespan = if (timeFinished == 0.0) 86400.0 * 7 - timeStarted else timeFinished - timeStarted
 
   def cpusStillNeeded: Double = cpusPerTask * unscheduledTasks
@@ -1688,26 +1580,20 @@ class Workload(val name: String,
 
   def jobUsefulThinkTimesPercentile(percentile: Double): Double = {
     assert(percentile <= 1.0 && percentile >= 0)
-    val scheduledJobs = jobs.filter(_.numSchedulingAttempts > 0).toList
-    // println("Setting up thinkTimesArray of length " +
-    //         scheduledJobs.length)
+    val scheduledJobs = jobs.filter(_.numSchedulingAttempts > 0).toList 
     if (scheduledJobs.length > 0) {
       val thinkTimesArray = new Array[Double](scheduledJobs.length)
       scheduledJobs.map(job => {
         job.usefulTimeScheduling
       }).copyToArray(thinkTimesArray)
-      util.Sorting.quickSort(thinkTimesArray)
-      //println(thinkTimesArray.deep.toSeq.mkString("-*-"))
-      // println("Looking up think time percentile value at position " +
-      //         ((thinkTimesArray.length-1) * percentile).toInt)
+      util.Sorting.quickSort(thinkTimesArray) 
       thinkTimesArray(((thinkTimesArray.length - 1) * percentile).toInt)
     } else {
       -1.0
     }
   }
 
-  def avgJobQueueTimeTillFirstScheduled: Double = {
-    // println("Computing avgJobQueueTimeTillFirstScheduled.")
+  def avgJobQueueTimeTillFirstScheduled: Double = { 
     val scheduledJobs = jobs.filter(_.numSchedulingAttempts > 0)
     if (scheduledJobs.length > 0) {
       val queueTimes = scheduledJobs.map(_.timeInQueueTillFirstScheduled).sum
@@ -1717,8 +1603,7 @@ class Workload(val name: String,
     }
   }
 
-  def avgJobQueueTimeTillFullyScheduled: Double = {
-    // println("Computing avgJobQueueTimeTillFullyScheduled.")
+  def avgJobQueueTimeTillFullyScheduled: Double = { 
     val scheduledJobs = jobs.filter(_.numSchedulingAttempts > 0)
     if (scheduledJobs.length > 0) {
       val queueTimes = scheduledJobs.map(_.timeInQueueTillFullyScheduled).sum
@@ -1749,8 +1634,7 @@ class Workload(val name: String,
     }
   }
 
-  def avgJobMakespan: Double = {
-    // println("Computing avgJobQueueTimeTillFullyScheduled.")
+  def avgJobMakespan: Double = { 
     val scheduledJobs = jobs.filter(_.numSchedulingAttempts > 0)
     if (scheduledJobs.length > 0) {
       val makespans = scheduledJobs.map(_.makespan).sum
@@ -2046,8 +1930,6 @@ object DistCache {
       val parsedLine = line.split(" ")
       // The following parsing code is based on the space-delimited schema
       // used in textfile. See the README for a description.
-      // val cell: Double = parsedLine(1).toDouble
-      // val allocationPolicy: String = parsedLine(2)
       val isServiceJob: Boolean = if (parsedLine(2).equals("1")) {
         true
       }
@@ -2072,14 +1954,11 @@ object DistCache {
     val dataPointsArray = dataPoints.toArray
     util.Sorting.quickSort(dataPointsArray)
     for (i <- 0 to 1000) {
-      // Store summary quantiles.
-      // 99.9 %tile = length * .999
+      // Store summary quantiles. 
       val index = ((dataPointsArray.length - 1) * i / 1000.0).toInt
       val currPercentile =
         dataPointsArray(index)
-      refDistribution(i) = currPercentile
-      // println("refDistribution(%d) = dataPointsArray(%d) = %f"
-      //         .format(i, index, currPercentile))
+      refDistribution(i) = currPercentile 
     }
     refDistribution
   }
@@ -2524,11 +2403,7 @@ class DailyExpExpExpWorkloadGenerator(val workloadName: String,
     //timeCofficients = modifyAmplitude(timeCofficients, 2)
     val secondsSubmission = submissionTime % 86400.0
     val coeffIndex = (secondsSubmission / 3600.0).floor.toInt
-    /*val random = new Random();
-    var correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    while (correctedCoeff <= 0.0){
-      correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    }*/
+    
     val correctedCoeff = timeCofficients(coeffIndex);
 
     correctedCoeff
@@ -2601,18 +2476,12 @@ class WeeklyExpExpExpWorkloadGenerator(val workloadName: String,
     timeCoefficients.map(x => if (x < 1) x/amplitude else x * amplitude)
   }
 
-  def getCoeff(submissionTime: Double): Double = {
-    //var timeCofficients = (0.2 :: 0.2 :: 0.2 :: 2.2 :: 2.2 :: 2.2 :: 2.2 :: Nil)
+  def getCoeff(submissionTime: Double): Double = { 
     var timeCofficients = (2.2 :: 2.2 :: 0.7 :: 0.5 :: 0.4 :: 0.6 :: 0.6 :: Nil)
-    //var timeCofficients = (2.2 :: 0.6 :: 2.2 :: 0.6 :: 2.2 :: 0.6 :: 0.6 :: Nil)
-    //timeCofficients = modifyAmplitude(timeCofficients, 2)
+   
     val secondsSubmission = submissionTime % 604800.0
     val coeffIndex = (secondsSubmission / 86400.0).floor.toInt
-    /*val random = new Random();
-    var correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    while (correctedCoeff <= 0.0){
-      correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    }*/
+   
     val correctedCoeff = timeCofficients(coeffIndex);
 
     correctedCoeff
@@ -2686,26 +2555,15 @@ class WeeklyDailyExpExpExpWorkloadGenerator(val workloadName: String,
     timeCoefficients.map(x => if (x < 1) x/amplitude else x * amplitude)
   }
 
-  def getCoeff(submissionTime: Double): Double = {
-    //var timeCofficients = (0.2 :: 0.2 :: 0.2 :: 2.2 :: 2.2 :: 2.2 :: 2.2 :: Nil)
-    var timeCofficientsWeek = (2.2 :: 2.2 :: 0.7 :: 0.5 :: 0.4 :: 0.6 :: 0.6 :: Nil)
-    //var timeCofficients = (2.2 :: 0.6 :: 2.2 :: 0.6 :: 2.2 :: 0.6 :: 0.6 :: Nil)
-    //timeCofficients = modifyAmplitude(timeCofficients, 2)
+  def getCoeff(submissionTime: Double): Double = { 
+    var timeCofficientsWeek = (2.2 :: 2.2 :: 0.7 :: 0.5 :: 0.4 :: 0.6 :: 0.6 :: Nil)  
     val secondsSubmissionWeek = submissionTime % 604800.0
     val coeffIndexWeek = (secondsSubmissionWeek / 86400.0).floor.toInt
 
 
     var timeCofficientsDay = (0.7 :: 0.5 :: 0.4 :: 0.5 :: 0.5 :: 0.5 :: 0.4 :: 0.4 :: 0.4 :: 2.6 :: 1.8 :: 0.7 :: 0.4 :: 1.8 :: 2.1 :: 2.5 :: 0.7 :: 0.4 :: 0.7 :: 1.8 :: 2.1 :: 1.6 :: 1.7 :: 0.9 :: Nil)
-    //timeCofficients = modifyAmplitude(timeCofficients, 2)
-    val secondsSubmissionDay = submissionTime % 86400.0
+      val secondsSubmissionDay = submissionTime % 86400.0
     val coeffIndexDay = (secondsSubmissionDay / 3600.0).floor.toInt
-
-
-    /*val random = new Random();
-    var correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    while (correctedCoeff <= 0.0){
-      correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    }*/
     val correctedCoeff = timeCofficientsWeek(coeffIndexWeek) * timeCofficientsDay(coeffIndexDay);
     correctedCoeff
   }
@@ -2782,11 +2640,7 @@ class DailyWeiWeiWeiWorkloadGenerator(val workloadName: String,
     //timeCofficients = modifyAmplitude(timeCofficients, 2)
     val secondsSubmission = submissionTime % 86400.0
     val coeffIndex = (secondsSubmission / 3600.0).floor.toInt
-    /*val random = new Random();
-    var correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    while (correctedCoeff <= 0.0){
-      correctedCoeff = random.nextGaussian()*(timeCofficients(coeffIndex)/1.3)+timeCofficients(coeffIndex);
-    }*/
+ 
     val correctedCoeff = timeCofficients(coeffIndex);
 
     correctedCoeff
@@ -2911,8 +2765,7 @@ object PrefillJobListsCache {
   }
 
   def getCpusPerTaskDistribution(workloadName: String,
-                                 traceFileName: String): Array[Double] = {
-    //TODO(andyk): Fix this ugly hack of prepending "Prefill".
+                                 traceFileName: String): Array[Double] = { 
     val jobs = getOrLoadJobs("Prefill" + workloadName, traceFileName)
     println("Loaded or retreived %d %s jobs in tracefile %s."
       .format(jobs.size, "Prefill" + workloadName, traceFileName))
@@ -2921,8 +2774,7 @@ object PrefillJobListsCache {
   }
 
   def getMemPerTaskDistribution(workloadName: String,
-                                traceFileName: String): Array[Double] = {
-    //TODO(andyk): Fix this ugly hack of prepending "Prefill".
+                                traceFileName: String): Array[Double] = { 
     val jobs = getOrLoadJobs("Prefill" + workloadName, traceFileName)
     println("Loaded or retreived %d %s jobs in tracefile %s."
       .format(jobs.size, "Prefill" + workloadName, traceFileName))
@@ -2956,8 +2808,7 @@ class PrefillPbbTraceWorkloadGenerator(val workloadName: String,
       traceFileName,
       timeWindow)
     val workload = new Workload(workloadName)
-
-    //TODO(andyk): Make this more functional.
+ 
     def reachedMaxCpu(currCpus: Double) = maxCpus.exists(currCpus >= _)
 
     def reachedMaxMem(currMem: Double) = maxMem.exists(currMem >= _)

@@ -8,8 +8,7 @@ import scala.util.control.Breaks
 /**
  * Created by dfernandez on 11/1/16.
  */
-// This picker doesn't take into account yet shutted down machines nor capacity security margins nor performance
-// TODO: Make a Quicksort-like strategy or pass a candidate index to iterate (e.g. the last successful candidate)
+// This picker doesn't take into account yet shutted down machines nor capacity security margins nor performance 
 object BasicPickerCandidatePower extends CellStateResourcesPicker{
   override def pickResource(cellState: CellState, job: Job, candidatePool: IndexedSeq[Int], remainingCandidates: Int) = {
     var machineID = -1

@@ -5,8 +5,7 @@ import ClusterSchedulingSimulation.CellState
 /**
  * Created by dfernandez on 8/1/16.
  */
-// Initially defined as an object for simplicity of usage
-// TODO: Become a class if necessary
+// Initially defined as an object for simplicity of usage 
 object PowerStateLoadSorter extends CellStateResourcesSorter{
 
   override val name: String = "power-load-sorter"

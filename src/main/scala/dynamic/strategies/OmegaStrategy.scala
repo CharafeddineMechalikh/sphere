@@ -33,8 +33,7 @@ class OmegaStrategy(sched : DynamicScheduler) extends RMStrategy {
       job.numTaskSchedulingAttempts += job.unscheduledTasks
       // Schedule the job in private cellstate.
       assert(job.unscheduledTasks > 0)
-      val claimDeltas = scheduler.scheduleJob(job, privateCellState)
-      // TODO : No puedo usar Commit result, así que...
+      val claimDeltas = scheduler.scheduleJob(job, privateCellState) 
       var commitedDelta = Seq[ClaimDelta]()
       var conflictedDelta = Seq[ClaimDelta]()
       scheduler.simulator.log(("Job %d (%s) finished %f seconds of scheduling " +
@@ -71,17 +70,10 @@ class OmegaStrategy(sched : DynamicScheduler) extends RMStrategy {
             job.numSchedulingAttempts == 1)
         } else {
           scheduler.numFailedTransactions += 1
-          scheduler.incrementDailycounter(scheduler.dailyFailedTransactions)
-          // omegaSimulator.log("adding %f seconds to wastedThinkTime counter."
-          //                   .format(jobThinkTime))
+          scheduler.incrementDailycounter(scheduler.dailyFailedTransactions) 
           scheduler.recordWastedTimeScheduling(job,
             jobThinkTime,
-            job.numSchedulingAttempts == 1)
-          // omegaSimulator.log(("Transaction task CONFLICTED for job-%d on " +
-          //                     "machines %s.")
-          //                    .format(job.id,
-          //                            commitResult.conflictedDeltas.map(_.machineID)
-          //                            .mkString(", ")))
+            job.numSchedulingAttempts == 1) 
         }
       } else {
         scheduler.simulator.log(("Not enough resources of the right shape were " +
@@ -127,20 +119,12 @@ class OmegaStrategy(sched : DynamicScheduler) extends RMStrategy {
       } else {
         // All tasks in job scheduled so don't put it back in pendingQueue.
         jobEventType = "fully-scheduled"
-      }
-      //TODO: Buen sitio para la lógica de encender
+      } 
       if(scheduler.dynamicSimulator.cellState.numberOfMachinesOn < scheduler.dynamicSimulator.cellState.numMachines){
         scheduler.simulator.powerOn.powerOn(scheduler.dynamicSimulator.cellState, job, "omega", commitedDelta, conflictedDelta)
       }
       if (!jobEventType.equals("")) {
-        // println("%s %s %d %s %d %d %f"
-        //         .format(Thread.currentThread().getId(),
-        //                 name,
-        //                 hashCode(),
-        //                 jobEventType,
-        //                 job.id,
-        //                 job.numSchedulingAttempts,
-        //                 simulator.currentTime - job.submitted))
+        
       }
 
       scheduler.dynamicSimulator.log("Set " + name + " scheduling to FALSE")
@@ -150,9 +134,7 @@ class OmegaStrategy(sched : DynamicScheduler) extends RMStrategy {
         scheduler.scheduling = true
         handleJob(scheduler.pendingQueue.dequeue)
       }
-      /*else if(scheduler.chosenStrategy.name == "Mesos"){
-        scheduler.chosenStrategy.start()
-      }*/
+      
     }
   }
 
@@ -160,8 +142,7 @@ class OmegaStrategy(sched : DynamicScheduler) extends RMStrategy {
     scheduler.checkRegistered
     privateCellState = scheduler.dynamicSimulator.cellState.copy
     scheduler.simulator.log("%s synced private cellstate.".format(name))
-    // println("Scheduler %s (%d) has new private cell state %d"
-    //         .format(name, hashCode, privateCellState.hashCode))
+     
   }
 
   override def start(): Unit = {

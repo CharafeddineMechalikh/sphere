@@ -64,8 +64,7 @@ class GeneticStandardPicker(populationSize : Int = 20, crossoverProbability : Do
             chromosome1 = c1stays ++ c2crosses
             chromosome2 = c2stays ++ c1crosses
           }
-          //Let's introduce Mutation later
-          //TODO : Mutation
+          //Let's introduce Mutation later 
           chromosome1 = mutatingFunction.mutate(chromosome1,mutationProbability,cellState,job)
           chromosome2 = mutatingFunction.mutate(chromosome2,mutationProbability,cellState,job)
           newPopulation += chromosome1

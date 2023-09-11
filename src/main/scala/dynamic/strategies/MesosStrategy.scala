@@ -21,8 +21,7 @@ class MesosStrategy(sched : DynamicScheduler) extends RMStrategy {
         scheduler.dynamicSimulator.cellState.totalOccupiedMem,
         scheduler.dynamicSimulator.cellState.totalOccupiedMem /
           scheduler.dynamicSimulator.cellState.totalMem * 100.0,
-        "%"))
-    //super.addJob(job)
+        "%")) 
     scheduler.pendingQueue.enqueue(job)
     scheduler.dynamicSimulator.log("Enqueued job %d of workload type %s."
       .format(job.id, job.workloadName))
@@ -41,9 +40,7 @@ class MesosStrategy(sched : DynamicScheduler) extends RMStrategy {
       val offerResponse = collection.mutable.ListBuffer[ClaimDelta]()
       var aggThinkTime: Double = 0.0
       var lastJobScheduled : Option[Job] = None
-      // TODO(andyk): add an efficient method to CellState that allows us to
-      //              check the largest slice of available resources to decode
-      //              if we should keep trying to schedule or not.
+     
       while (offer.cellState.availableCpus > 0.000001 &&
         offer.cellState.availableMem > 0.000001 &&
         !scheduler.pendingQueue.isEmpty) {
@@ -125,8 +122,7 @@ class MesosStrategy(sched : DynamicScheduler) extends RMStrategy {
               job.numSchedulingAttempts))
             scheduler.numJobsTimedOutScheduling += 1
             jobEventType = "abandoned"
-          } else {
-            //FIXME: Tenemos que tener en cuenta las máquinas que se están encendiendo?
+          } else { 
             if((scheduler.dynamicSimulator.cellState.numberOfMachinesOn) < scheduler.dynamicSimulator.cellState.numMachines){
               scheduler.recordWastedTimeSchedulingPowering(job, scheduler.dynamicSimulator.cellState.powerOnTime/4+0.1)
               scheduler.dynamicSimulator.afterDelay(scheduler.dynamicSimulator.cellState.powerOnTime/4+0.1) {
@@ -145,16 +141,7 @@ class MesosStrategy(sched : DynamicScheduler) extends RMStrategy {
           jobEventType = "fully-scheduled"
         }
         if (!jobEventType.equals("")) {
-          // Print some stats that we can use to generate CDFs of the job
-          // # scheduling attempts and job-time-till-scheduled.
-          // println("%s %s %d %s %d %d %f"
-          //         .format(Thread.currentThread().getId(),
-          //                 name,
-          //                 hashCode(),
-          //                 jobEventType,
-          //                 job.id,
-          //                 job.numSchedulingAttempts,
-          //                 simulator.currentTime - job.submitted))
+           
         }
       }
 
@@ -239,15 +226,13 @@ class MesosStrategy(sched : DynamicScheduler) extends RMStrategy {
               delta.cpus,
               delta.mem,
               scheduler.dynamicSimulator.cellState.availableCpus,
-              scheduler.dynamicSimulator.cellState.availableMem))
-          //FIXME:Esto tiene sentido?
+              scheduler.dynamicSimulator.cellState.availableMem)) 
           if(scheduler.chosenStrategy.name=="Mesos"){
             scheduler.dynamicSimulator.allocator.schedBuildAndSendOffer()
           }
         }
       })
-    }
-    //TODO: Buen sitio para la lógica de encender
+    } 
     if(scheduler.dynamicSimulator.cellState.numberOfMachinesOn < scheduler.dynamicSimulator.cellState.numMachines){
       scheduler.dynamicSimulator.powerOn.powerOn(scheduler.dynamicSimulator.cellState, requestJob, "mesos")
     }
@@ -261,11 +246,8 @@ class MesosStrategy(sched : DynamicScheduler) extends RMStrategy {
     scheduler.dynamicSimulator.allocator.schedBuildAndSendOffer()
   }
 
-  def removeOffers(): Unit = {
-    //println("Entra en removeOffers "+simulator.currentTime.toString)
-    //for (offer <- offerQueue.filter(_.scheduler == this)) {
-    for (offer <- scheduler.offerQueue.dequeueAll(_.scheduler == this)) {
-      //println("Había offers pendientes "+simulator.currentTime.toString)
+  def removeOffers(): Unit = {  
+    for (offer <- scheduler.offerQueue.dequeueAll(_.scheduler == this)) { 
       scheduler.dynamicSimulator.allocator.offeredDeltas.remove(offer.id).foreach(savedDeltas => {
         savedDeltas.foreach(_.unApply(cellState = scheduler.dynamicSimulator.cellState,
           locked = true))

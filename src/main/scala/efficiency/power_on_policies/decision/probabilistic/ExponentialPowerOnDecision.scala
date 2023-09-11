@@ -13,8 +13,7 @@ class ExponentialPowerOnDecision(threshold : Double, windowSize: Int, ts : Doubl
     var should = false
     val allPastTuples = getPastTuples(cellState, windowSize)
     val dangerousPastTuples = allPastTuples.filter(pastTuple => (pastTuple._2.numTasks * pastTuple._2.cpusPerTask > cellState.availableCpus - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor)) || (pastTuple._2.numTasks * pastTuple._2.memPerTask > cellState.availableMem - (cellState.numberOfMachinesOn * cellState.memPerMachine * lostFactor)))
-    //val jobAttributes = getJobAttributes(allPastTuples)
-    if(dangerousPastTuples.size > 0){
+     if(dangerousPastTuples.size > 0){
       var interArrival= 0.0
       if(dangerousPastTuples.size == 1){
         interArrival = dangerousPastTuples(0)._1

@@ -8,8 +8,7 @@ import scala.util.control.Breaks
 /**
  * Created by dfernandez on 11/1/16.
  */
-// This picker doesn't take into account yet shutted down machines nor capacity security margins nor performance
-// TODO: Make a Quicksort-like strategy or pass a candidate index to iterate (e.g. the last successful candidate)
+// This picker doesn't take into account yet shutted down machines nor capacity security margins nor performance 
 object GreedyMakespanPickerCandidatePower extends CellStateResourcesPicker{
   val randomNumberGenerator = new util.Random(Seed())
 
@@ -20,8 +19,7 @@ object GreedyMakespanPickerCandidatePower extends CellStateResourcesPicker{
     val loop = new Breaks;
     if(job.workloadName == "Batch"){
       loop.breakable {
-        for(i <- 0 until cellState.numMachines){
-          //FIXME: Putting a security margin of 0.01 because mesos is causing conflicts
+        for(i <- 0 until cellState.numMachines){ 
           val mID = cellState.machinesPerformanceOrdered(i)
           if (cellState.isMachineOn(mID) && cellState.availableCpusPerMachine(mID) >= (job.cpusPerTask + 0.0001) && cellState.availableMemPerMachine(mID) >= (job.memPerTask + 0.0001)) {
             machineID=mID

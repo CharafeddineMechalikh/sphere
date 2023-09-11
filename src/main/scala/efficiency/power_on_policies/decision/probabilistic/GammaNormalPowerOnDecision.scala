@@ -18,7 +18,6 @@ class GammaNormalPowerOnDecision(normalThreshold: Double, threshold : Double, wi
     if(jobAttributes._1 > 0.0 && jobAttributes._2 > 0.0 && jobAttributes._3 > 0.0 && jobAttributes._4 > 0.0 && jobAttributes._5 > 0.0 && jobAttributes._6 > 0.0){
       val alphaCpu = (cellState.availableCpus - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor)) / getNormalDistributionInverseCummulativeProbability(jobAttributes._5, jobAttributes._6, normalThreshold)
       val alphaMem = (cellState.availableMem - (cellState.numberOfMachinesOn * cellState.memPerMachine * lostFactor))  / getNormalDistributionInverseCummulativeProbability(jobAttributes._3, jobAttributes._4, normalThreshold)
-      //FIXME: en la implementación anterior teníamos un floor de (alphacpu+alphamem) /2 y le sumábamos 1
       if(alphaCpu > 0.0 || alphaMem > 0.0) {
         var beta = getNormalDistributionInverseCummulativeProbability(jobAttributes._1, jobAttributes._2, 1-normalThreshold)
         if (beta < 0)

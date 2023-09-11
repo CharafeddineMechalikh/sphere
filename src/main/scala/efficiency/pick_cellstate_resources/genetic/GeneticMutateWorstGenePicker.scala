@@ -57,13 +57,7 @@ class GeneticMutateWorstGenePicker(populationSize : Int = 20, crossoverProbabili
           var chromosome2 = crossingChromosomes(1)
           if(randomNumberGenerator.nextDouble() < crossoverProbability){
             //Crossing
-            /*//We can't cross like a standard genetic. Our random is the amount of tasks that we remain
-            val range = 0 until cellState.numMachines
-            val crossingPoint = (range(randomNumberGenerator.nextInt(range length)))
-            val (c1stays, c1crosses) = chromosome1.splitAt(crossingPoint)
-            val (c2stays, c2crosses) = chromosome2.splitAt(crossingPoint)
-            chromosome1 = c1stays ++ c2crosses
-            chromosome2 = c2stays ++ c1crosses*/
+  
             val crossedChromosomes = crossingFunction.cross(chromosome1,chromosome2)
             chromosome1 = crossedChromosomes._1
             chromosome2 = crossedChromosomes._2

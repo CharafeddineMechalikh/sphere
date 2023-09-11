@@ -15,16 +15,8 @@ class ExponentialPowerOffDecision(threshold : Double, windowSize: Int, lostFacto
   override def shouldPowerOff(cellState: CellState, machineID: Int): Boolean = {
     var should = false
     val allPastTuples = getPastTuples(cellState, windowSize)
-    //val meanCpuPerTask = mean(allPastTuples.map(_._2.cpusPerTask))
-    //val meanMemPerTask = mean(allPastTuples.map(_._2.memPerTask))
-    //val meanFreeCpuPerOnMachine = (cellState.availableCpus - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor))/cellState.numberOfMachinesOn
-    //val meanFreeMemPerOnMachine = (cellState.availableMem - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor))/ cellState.numberOfMachinesOn
-    //val lostCpuFactor = getExponentialDistributionCummulativeProbability(meanCpuPerTask, meanFreeCpuPerOnMachine)
-    //val lostMemFactor = getExponentialDistributionCummulativeProbability(meanMemPerTask, meanFreeMemPerOnMachine)
     val dangerousPastTuples = allPastTuples.filter(pastTuple => (pastTuple._2.numTasks * pastTuple._2.cpusPerTask > cellState.availableCpus - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor)) || (pastTuple._2.numTasks * pastTuple._2.memPerTask >  cellState.availableMem - (cellState.numberOfMachinesOn * cellState.memPerMachine * lostFactor)))
-    //val dangerousPastTuples = allPastTuples.filter(pastTuple => (pastTuple._2.numTasks * pastTuple._2.cpusPerTask > (cellState.availableCpus - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor)) * lostCpuFactor) || (pastTuple._2.numTasks * pastTuple._2.memPerTask >  (cellState.availableMem - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor)) * lostMemFactor))
-    //val jobAttributes = getJobAttributes(allPastTuples)
-    if(dangerousPastTuples.size > 0){
+     if(dangerousPastTuples.size > 0){
       var interArrival= 0.0
       if(dangerousPastTuples.size == 1){
         interArrival = dangerousPastTuples(0)._1

@@ -178,9 +178,6 @@ object Simulation {
       Map[String, Seq[String]]("Batch" -> Seq("Monolithic"),
                              "Service" -> Seq("Monolithic"))
 
-    /*var mesos1BatchSchedulerWorkloadMap =
-      Map[String, Seq[String]]("Batch" -> Seq("MesosBatch"),
-                             "Service" -> Seq("MesosService"))*/
 
     var mesos4BatchSchedulerWorkloadMap =
       Map[String, Seq[String]]("Batch" -> Seq("MesosBatch",
@@ -240,8 +237,7 @@ object Simulation {
     /**
      * Set up a simulatorDesc-s.
      */
-    val globalRunTime = 86400.0 * 7
-    //val globalRunTime = 86400.0 * 30 // 1 Day
+    val globalRunTime = 86400.0 * 7 
     val monolithicSimulatorDesc =
       new MonolithicSimulatorDesc(Array(monolithicSchedulerDesc),
         globalRunTime)
@@ -256,33 +252,6 @@ object Simulation {
         runTime = globalRunTime,
         allocatorConstantThinkTime = 0.001)
 
-/*
-    /**
-     * Synthetic workloads for testing.
-     * These can probably be deleted eventually.
-     */
-    val synthWorkloadGeneratorService =
-      new ExpExpExpWorkloadGenerator(workloadName = "Service".intern(),
-        initAvgJobInterarrivalTime = 5.0,
-        avgTasksPerJob = 100,
-        avgJobDuration = 10.0,
-        avgCpusPerTask = 1.0,
-        avgMemPerTask = 1.5)
-    val synthWorkloadGeneratorBatch =
-      new ExpExpExpWorkloadGenerator(workloadName = "Batch".intern(),
-        initAvgJobInterarrivalTime = 3.0,
-        avgTasksPerJob = 100,
-        avgJobDuration = 10.0,
-        avgCpusPerTask = 1.0,
-        avgMemPerTask = 1.5)
-    val synthWorkloadDesc =
-      WorkloadDesc(cell = "synth",
-        assignmentPolicy = "none",
-        workloadGenerators =
-          synthWorkloadGeneratorService ::
-            synthWorkloadGeneratorBatch :: Nil,
-        cellStateDesc = exampleCellStateDesc)
-*/
     /**
      * Set up parameter sweeps.
      */
@@ -292,19 +261,16 @@ object Simulation {
       (0.015 to 0.1 by 0.005).toList :::
       (0.15 to 1.0 by 0.05).toList :::
       (1.5 to 10.0 by 0.5).toList :::
-      (15.0 to 100.0 by 5.0).toList // :::
-    // (150.0 to 1000.0 by 50.0).toList
+      (15.0 to 100.0 by 5.0).toList // ::: 
 
     // Full PerTaskRange is 55 values.
     val fullPerTaskRange: List[Double] = (0.001 to 0.01 by 0.0005).toList :::
       (0.015 to 0.1 by 0.005).toList :::
-      (0.15 to 1.0 by 0.05).toList // :::
-    // (1.5 to 10 by 0.5).toList
+      (0.15 to 1.0 by 0.05).toList // ::: 
 
     // Full lambda is 20 values.
     val fullLambdaRange: List[Double] = (0.01 to 0.11 by 0.01).toList :::
-      (0.15 to 1.0 by 0.1).toList // :::
-    // (1.5 to 10.0 by 1.0).toList
+      (0.15 to 1.0 by 0.1).toList // ::: 
 
     val fullPickinessRange: List[Double] = (0.00 to 0.75 by 0.05).toList
 
@@ -326,26 +292,10 @@ object Simulation {
      * we want to use.
      */
     var allWorkloadDescs = List[WorkloadDesc]()
-    //Este es el que estaba
-    //allWorkloadDescs ::= exampleGeneratedWorkloadPrefillDesc
+    //Este es el que estaba 
     //Nuevo
     allWorkloadDescs = workloadGenerators
-    //allWorkloadDescs ::= exampleWorkloadPrefillDesc
-
-    // Prefills jobs based on prefill trace, draws job and task stats from
-    // exponential distributions.
-    // allWorkloadDescs ::= exampleInterarrivalTimeTraceWorkloadPrefillDesc
-
-    // Prefills jobs based on prefill trace. Loads Job stats (interarrival
-    // time, num tasks, duration) from traces, and task stats from
-    // exponential distributions.
-    // allWorkloadDescs ::= exampleTraceWorkloadPrefillDesc
-
-    // Prefills jobs based on prefill trace. Loads Job stats (interarrival
-    // time, num tasks, duration) and task stats (cpusPerTask, memPerTask)
-    // from traces.
-    //allWorkloadDescs ::= exampleTraceAllWorkloadPrefillDesc
-
+  
     /**
      * Set up a run of experiments.
      */
@@ -355,22 +305,16 @@ object Simulation {
 
     // -----------------Dynamic-----------------
     val numDynamicServiceSchedsRange = Seq(1)
-    val numDynamicBatchSchedsRange = Seq(4)
-    //val numOmegaBatchSchedsRange = Seq(1)
-    //val strategiesToSwitch = ("Omega" :: "Mesos" :: Nil)
+    val numDynamicBatchSchedsRange = Seq(4) 
     val strategiesToSwitch = ("Mesos" :: "Omega" :: Nil)
     val dynamicSimulatorSetups =
       for (numDynamicServiceScheds <- numDynamicServiceSchedsRange;
            numDynamicBatchScheds <- numDynamicBatchSchedsRange) yield {
         // List of the different {{SimulatorDesc}}s to be run with the
         // SchedulerWorkloadMap and SchedulerWorkloadToSweep.
-        val dynamicSimulatorDescs = for (
-          //conflictMode <- Seq("sequence-numbers", "resource-fit");
-          conflictMode <- Seq("resource-fit");
-          //conflictMode <- Seq("sequence-numbers");
-          transactionMode <- Seq("all-or-nothing")) yield {
-          //transactionMode <- Seq("all-or-nothing", "incremental")) yield {
-          //transactionMode <- Seq("incremental")) yield {
+        val dynamicSimulatorDescs = for ( 
+          conflictMode <- Seq("resource-fit"); 
+          transactionMode <- Seq("all-or-nothing")) yield { 
           new DynamicSimulatorDesc(
             generateDynamicSchedulerDescs(numDynamicServiceScheds,
               numDynamicBatchScheds),
@@ -397,7 +341,6 @@ object Simulation {
     // ------------------Omega------------------
     val numOmegaServiceSchedsRange = Seq(1)
     val numOmegaBatchSchedsRange = Seq(4)
-    //val numOmegaBatchSchedsRange = Seq(1)
 
     val omegaSimulatorSetups =
       for (numOmegaServiceScheds <- numOmegaServiceSchedsRange;
@@ -405,12 +348,8 @@ object Simulation {
         // List of the different {{SimulatorDesc}}s to be run with the
         // SchedulerWorkloadMap and SchedulerWorkloadToSweep.
         val omegaSimulatorDescs = for (
-          //conflictMode <- Seq("sequence-numbers", "resource-fit");
-          conflictMode <- Seq("resource-fit");
-          //conflictMode <- Seq("sequence-numbers");
-          //transactionMode <- Seq("all-or-nothing")) yield {
-          //transactionMode <- Seq("all-or-nothing", "incremental")) yield {
-          transactionMode <- Seq("incremental")) yield {
+           conflictMode <- Seq("resource-fit");
+             transactionMode <- Seq("incremental")) yield {
             new OmegaSimulatorDesc(
               generateOmegaSchedulerDescs(numOmegaServiceScheds,
                 numOmegaBatchScheds),
@@ -433,24 +372,14 @@ object Simulation {
 
     // ------------------Mesos------------------
     val mesosSimulatorDesc = mesosSimulator4BatchDesc
-    //val mesosSimulatorDesc = mesosSimulator1BatchDesc
 
     val mesosSchedulerWorkloadMap = mesos4BatchSchedulerWorkloadMap
-    //val mesosSchedulerWorkloadMap = mesos1BatchSchedulerWorkloadMap
-
-    // val mesosSchedWorkloadsToSweep = Map("MesosBatch" -> List("Batch"),
-    //                                      "MesosBatch-2" -> List("Batch"),
-    //                                      "MesosBatch-3" -> List("Batch"),
-    //                                      "MesosBatch-4" -> List("Batch"))
-    //val mesosSchedWorkloadsToSweep = Map("MesosService" -> List("Service"))
-    //val mesosSchedWorkloadsToSweep = Map("MesosBatch" -> List("Batch"), "MesosService" -> List("Service"))
     val mesosSchedWorkloadsToSweep = Map("MesosBatch" -> List("Batch"),
                                           "MesosBatch-2" -> List("Batch"),
                                           "MesosBatch-3" -> List("Batch"),
                                           "MesosBatch-4" -> List("Batch"), "MesosService" -> List("Service"))
 
      val mesosWorkloadToSweep = "Batch"
-    // val mesosWorkloadToSweep = "Service"
 
     val runMonolithic = true
     val runMesos = true
@@ -463,34 +392,14 @@ object Simulation {
 
     //All sorting and picking policies
     val sortingPolicies = List[CellStateResourcesSorter](NoSorter,BasicLoadSorter)
-    //val pickingPolicies = List[CellStateResourcesPicker] (RandomPicker)
-    //val pickingPolicies = List[CellStateResourcesPicker] (BasicReversePickerCandidatePower)
-    //val pickingPolicies = List[CellStateResourcesPicker](RandomPicker, BasicReversePickerCandidatePower, new SpreadMarginReversePickerCandidatePower(spreadMargin = 0.05, marginPerc = 0.01))
-    //Krakow
-    //val pickingPolicies = List[CellStateResourcesPicker](RandomPicker, GASimplePickerCandidatePower, GreedyMakespanPickerCandidatePower)
-    //val pickingPolicies = List[CellStateResourcesPicker](new GeneticStandardPickerCandidatePower(populationSize=20, mutationProbability=0.01, crossingSelector=Agnieszka, fitnessFunction = Makespan, epochNumber = 500))
-    //val pickingPolicies = List[CellStateResourcesPicker](RandomPicker, GASimplePickerCandidatePower, GreedyMakespanPickerCandidatePower, new GeneticStandardPickerCandidatePower(populationSize=10, mutationProbability=0.01, crossingSelector=Agnieszka, fitnessFunction = Makespan, epochNumber = 300),new GeneticStandardPickerCandidatePower(populationSize=10, mutationProbability=0.01, crossingSelector=RouletteWheel, fitnessFunction = Makespan, epochNumber = 300),new GeneticStandardPickerCandidatePower(populationSize=10, mutationProbability=0.01, crossingSelector=TwoBest, fitnessFunction = Makespan, epochNumber = 300))
-    //val pickingPolicies = List[CellStateResourcesPicker](new GeneticMutateWorstGenePicker(populationSize=20, mutationProbability=0.5, crossingSelector=TwoBest, fitnessFunction = Makespan, crossingFunction = CrossGenes, epochNumber = 200))
-    //val pickingPolicies = List[CellStateResourcesPicker](AgnieszkaWithRandom)
-    //val pickingPolicies = List[CellStateResourcesPicker](GeneticNoCrossingMutatingWorstPicker)
-    //val pickingPolicies = List[CellStateResourcesPicker](AgnieszkaWithRandom) //This one is the best so far
-    //val pickingPolicies = List[CellStateResourcesPicker](new NewGeneticStandardPicker(populationSize=10, mutationProbability=0.5, crossoverProbability = 0.7, crossingSelector=TwoBest, fitnessFunction = Makespan, epochNumber = 2000, crossingFunction = CrossGenes, mutatingFunction = WorstRandom))
-    //val pickingPolicies = List[CellStateResourcesPicker](AgnieszkaSecurityWithRandom,AgnieszkaEnergySecurityWithRandom)
-    //val pickingPolicies = List[CellStateResourcesPicker](AgnieszkaSecurityWithRandom, new SpreadMarginReversePickerCandidatePower(spreadMargin = 0.05, marginPerc = 0.07), RandomPicker, AgnieszkaEnergySecurityWithRandom)
-    //val pickingPolicies = List[CellStateResourcesPicker](AgnieszkaEnergySecurityWithRandom)
-    //val pickingPolicies = List[CellStateResourcesPicker](AgnieszkaSecurityWithRandom)
     val pickingPolicies = List[CellStateResourcesPicker](new SpreadMarginReversePickerCandidatePower(spreadMargin = 0.05, marginPerc = 0.07))
-    //val pickingPolicies = List[CellStateResourcesPicker](new SpreadMarginReversePickerCandidatePower(spreadMargin = 0.05, marginPerc = 0.07), AgnieszkaSecurityWithRandom)
-    //val pickingPolicies = List[CellStateResourcesPicker](BasicReversePickerCandidatePower)
     val powerOnPolicies = List[PowerOnPolicy](new ComposedPowerOnPolicy(DefaultPowerOnAction, NoPowerOnDecision))
     val powerOffPolicies = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, NoPowerOffDecision))
 
 
     //Default sorting and picking policies
     val defaultSortingPolicy = List[CellStateResourcesSorter](PowerStateLoadSorter)
-    //val defaultPickingPolicy = List[CellStateResourcesPicker](BasicReversePickerCandidatePower)
-    //val defaultPickingPolicy = List[CellStateResourcesPicker](new SpreadMarginReversePickerCandidatePower(spreadMargin = 0.05, marginPerc = 0.02))
-    val defaultPickingPolicy = pickingPolicies
+     val defaultPickingPolicy = pickingPolicies
 
     //Stackelberg strategies
     val stackelbergCurrentAlwzOffMarginDecision = new SwitchBetweenCurrentAndSpecified(new ComposedPowerOffPolicy(DefaultPowerOffAction, AlwzPowerOffDecision), new FreeCapacityMinMarginPowerOffDecision(0.35))
@@ -504,52 +413,37 @@ object Simulation {
     }
 
 
-    val loadRange = (0.1 :: 0.5 :: 0.9 :: Nil)
-    //val loadRange = (0.1 to 0.99 by 0.2).toList
+    val loadRange = (0.1 :: 0.5 :: 0.9 :: Nil) 
     val defaultLoadRange = 0.5
 
     val freeCapacityRange = (0.35 :: 0.4 :: 0.45 ::  Nil)
     val freeCapacityOnRange = (0.05 :: 0.1 :: Nil)
 
     val constantCapacityRange = (0.1 :: 0.2 :: 0.3 ::  Nil)
-
-    //val freeCapacityRange = (0.1 to 0.99 by 0.2).toList
+ 
     val defaultFreeCapacityRange = 0.45
     val defaultConstantCapacityRange = 0.15
     val defaultFreeCapacityOnRange = 0.1
 
     val randomRange = (0.1 to 0.99 by 0.2).toList
     val randomDefaultThreshold = 0.5
-
-    //val normalThresholdRange = (0.05 to 0.99 by 0.1).toList
+ 
     val normalThresholdRange = (0.8 :: 0.85 :: 0.9 :: Nil)
-   // val normalThresholdRange = (0.05 to 0.5 by 0.05).toList
     val defaultNormalThreshold = 0.85
-/*
-    //val distributionThresholdRange = (0.05 to 0.99 by 0.1).toList
-    //val distributionThresholdRange = (0.01 :: 0.1 :: 0.5 :: 0.9 :: 0.99 ::Nil)
-    val distributionThresholdRange = (0.05 :: 0.1 :: 0.15 ::Nil)
-    val defaultDistributionThreshold = 0.05
-    val distributionOnThresholdRange = (0.01 :: 0.1 :: 0.9 :: 0.99 ::Nil)
-    val defaultOnDistributionThreshold = 0.5
-*/
+
     val distributionWindowRange = (25 :: Nil)
     val defaultWindowSize = 25
 
-    //val exponentialOffDistributionThresholdRange = (0.1 :: 0.3 :: 0.5 :: 0.7 :: 0.9 :: Nil)
     val exponentialOffDistributionThresholdRange = (0.1 :: 0.9 ::Nil)
     val exponentialOnDistributionThresholdRange = (0.2 :: 0.5 :: 0.8 ::Nil)
     val defaultExponentialOffDistributionThreshold = 0.1
     val defaultExponentialOnDistributionThreshold = 0.5
 
-    //val gammaOffDistributionThresholdRange = (0.1 :: 0.3 :: 0.5 :: 0.7 :: 0.9 ::Nil)
     val gammaOffDistributionThresholdRange = (0.1 :: 0.9 ::Nil)
     val gammaOnDistributionThresholdRange = (0.2 :: 0.5 :: 0.8 ::Nil)
     val defaultGammaOffDistributionThreshold = 0.1
     val defaultGammaOnDistributionThreshold = 0.5
 
-    //val dataCenterLostFactorRange = (0.15 :: 0.2 :: 0.25 :: 0.3 :: Nil)
-    //val dataCenterLostFactorRange = (0.15 :: 0.16 :: 0.17 :: 0.18 :: 0.19 :: 0.20 :: Nil)
     val dataCenterLostFactorRange = (0.25 :: 0.3 :: 0.35 :: Nil)
     val dataCenterLostFactorDefault = 0.35
 
@@ -561,7 +455,6 @@ object Simulation {
     val javierOrtegaTsRange = (30.0 :: 60.0 :: Nil)
     val javierOrtegaTsDefault = 60.0
     val javierOrtegaTimeRange = (300.0 :: 600.0 :: Nil)
-    //val javierOrtegaTimeRange = (600.0 :: Nil)
 
 
     val sweepMaxLoadOffRange = true
@@ -621,22 +514,6 @@ object Simulation {
     val runCombinedDefaultOrGammaNormal = false
     val runCombinedDefaultOrMargin = false
     val runCombinedDefaultOrExponential = false
-
-
-    //val defaultPowerOnPolicy = List[PowerOnPolicy](new ComposedPowerOnPolicy(new PowerOnMarginPercAvailableAction(0.99), new MarginPowerOnDecision(0.99)))
-    //val defaultPowerOnPolicy = List[PowerOnPolicy](new ComposedPowerOnPolicy(new GammaPowerOnAction(0.9, 0.7, 50), new CombinedPowerOnDecision(Seq(DefaultPowerOnDecision, new GammaNormalPowerOnDecision(0.9, 0.7, 50)), "or") ))
-    //val defaultPowerOnPolicy = List[PowerOnPolicy](new ComposedPowerOnPolicy(DefaultPowerOnAction, DefaultPowerOnDecision))
-    //val defaultPowerOnPolicy = List[PowerOnPolicy](new ComposedPowerOnPolicy(DefaultPowerOnAction, NoPowerOnDecision))
-
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, NoPowerOffDecision))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, AlwzPowerOffDecision))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, new LoadMaxPowerOffDecision(0.2)))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, new RandomPowerOffDecision(0.1)))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, new GammaPowerOffDecision(0.1, 50)))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, new GammaNormalPowerOffDecision(0.9, 0.3, 50)))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, new ExponentialPowerOffDecision(0.6, 25)))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, new GammaFreePowerOffDecision(0.00000001, 25)))
-    //val defaultPowerOffPolicy = List[PowerOffPolicy](new ComposedPowerOffPolicy(DefaultPowerOffAction, new ExpNormPowerOffDecision(0.00000000000000000000000001, 25)))
 
     var defaultPowerOnPolicy = List[PowerOnPolicy]()
     var defaultPowerOffPolicy = List[PowerOffPolicy]()
@@ -1122,46 +999,26 @@ object Simulation {
       }
     }
 
-    //var security1Range = (1.0 :: 10.0 :: 30.0 :: Nil) //seconds added to tasks of this security level
     var security1Range = (10.0 :: 30.0 :: Nil)
     security1Range = (0.0 :: Nil) //disable
-    //var security2Range = (10.0 :: 60.0 :: 120.0 :: Nil) //seconds added to tasks of this security level
     var security2Range = (60.0 :: 180.0 :: Nil) //seconds added to tasks of this security level
     security2Range = (0.0 :: Nil) //disable
-    //var security3Range = (60.0 :: 120.0 :: 240.0 :: Nil) //seconds added to tasks of this security level
     var security3Range = (360.0 :: 1080.0 :: Nil) //seconds added to tasks of this security level
     security3Range = (0.0 :: Nil) //disable
-    //val constantRange = (0.1 :: 1.0 :: Nil)
-    //TODO: Primera prueba resultados edge para no separar entre las dos generacione de experimentos, 1.0 es cloud, 0.7 edge, luego descartamos
-    //val constantRange = (0.5 :: 1.0 :: 1.5 :: 2.0 :: 2.5 :: 3.0 :: 4.0 :: 4.5 :: 5.0 :: 5.5 :: 6.0 :: 6.5 :: 7.0 :: 7.5 :: 8.0 :: 8.5 :: 9.0 :: 9.5 :: 10.0 :: Nil)
-    //val constantRange = (0.2 :: Nil)
-    //  0.25 latencia =  0.25 --> latencia 50 ms, 0.3 --> latencia 100 ms, 0.35 --> lat. 150ms, 0.4 --> lat. 200ms, 0.45 --> lat 250ms, 0.5 --> lat. 300
-    //val constantRange = (0.25 :: 0.3 :: 0.35 :: 0.4 :: 0.45 :: 0.5 :: Nil)
+   
     val constantRange = (0.1 :: Nil)
-    // 0.16--> latencia 10ms, 0.18 --> latencia 30ms, 0.2 --> latencia 50ms
     val constantRangeEdge = (0.16 :: 0.18 :: 0.2 :: Nil)
 
-    //val constantRange = medConstantRange
-    // val constantRange = fullConstantRange
-    //val perTaskRange = (0.01 :: 0.1 :: 1.0 :: Nil)
     val perTaskRange = (0.01 :: Nil)
-    //val perTaskRange = (0.1 :: Nil)
-    //Para los test anova
-    //val perTaskRange = (0.2 :: 0.2 :: 0.2 :: 0.2 :: 0.2 :: 0.2 :: 0.2 :: 0.2 :: 0.2 :: 0.2 :: Nil)
-    // val perTaskRange = medPerTaskRange
-    // val perTaskRange = fullPerTaskRange
+  
     val pickinessRange = fullPickinessRange
-    // val lambdaRange = fullLambdaRange
+    
     val interArrivalScaleRange = 0.009 :: 0.01 :: 0.02 :: 0.1 :: 0.2 :: 1.0 :: Nil
-    // val interArrivalScaleRange = lambdaRange.map(1/_)
-    //val prefillRange = (0.3 to 0.3 by 0.1).toList
-    //val prefillRange = (0.2 to 0.8 by 0.05).toList
-    //val prefillRange = (0.2 ::0.6 :: 0.8 :: Nil)
+  
     val prefillRange = (0.2 :: Nil)
     var prefillCpuLim = List[Map[String, Double]]()
     for (prefillPerc <- prefillRange) {prefillCpuLim ::= Map("PrefillBatch" -> prefillPerc, "PrefillService" -> prefillPerc, "PrefillBatchService" -> prefillPerc)}
-    //val prefillCpuLim = Map("PrefillBatch" -> 0.3, "PrefillService" -> 0.3, "PrefillBatchService" -> 0.3)
-    val doLogging = false
+   val doLogging = false
     val timeout = 60.0 * 60.0 *10000.0 // In seconds.
 
     val sweepC = false
@@ -1207,24 +1064,11 @@ object Simulation {
     }
     //Esta aproximación intenta aglutinar todas las cargas en una misma carpeta en vez de generar 15 carpetas para 15 cargas
       val outputDirName = "%s/%s-%s-%.0f"
-      //val outputDirName = "%s/%s-%s-%s-%.0f"
       .format(
         experDir.toString,
         dateTimeStamp,
         "vary_" + sweepDimensions.mkString("_"),
-        /*wlDescs.map(i => {
-          i.cell + i.assignmentPolicy +
-            (if (i.prefillWorkloadGenerators.length > 0) {
-              "_prefilled"
-            } else {
-              ""
-            })
-        }).mkString("_"),*/
-        /*wlDescs(0).cell + wlDescs(0).assignmentPolicy + (if (wlDescs(0).prefillWorkloadGenerators.length > 0) {
-          "_prefilled"
-        } else {
-          ""
-        }),*/
+       
         globalRunTime)
     println("outputDirName is %s".format(outputDirName))
 
@@ -1239,62 +1083,13 @@ object Simulation {
       val multiPathSetup = ("multi", Map("Monolithic" -> List("Service")))
       val singlePathSetup =
         ("single", Map("Monolithic" -> List("Service", "Batch")))
-      //List(singlePathSetup, multiPathSetup).foreach {
+     
       //Now only the single path is run
       List(singlePathSetup).foreach {
         case (multiOrSingle, schedulerWorkloadsMap) => {
           //Tres workload generator: workloadGEneratorsCloud: Cloud only
           // workloadGeneratorsEdge: tanto para los cloudlet sbc como los high end
           // workloadGeneratorsEdgeCloud: para el cloud cuando colabora con cloudlets
-/*
-          //Isolated strategies: cloud only
-            allExperiments ::= new Experiment(
-              name = "google-monolithic-%s_path-cloud-only"
-                .format(multiOrSingle),
-              workloadToSweepOver = "Service",
-              workloadDescs = workloadGeneratorsCloud,
-              schedulerWorkloadsToSweepOver = schedulerWorkloadsMap,
-              constantThinkTimeRange = constantRange,
-              perTaskThinkTimeRange = perTaskRange,
-              blackListPercentRange = (0.0 :: Nil),
-              schedulerWorkloadMap = monolithicSchedulerWorkloadMap,
-              simulatorDesc = monolithicSimulatorDesc,
-              logging = doLogging,
-              outputDirectory = outputDirName,
-              prefillCpuLimits = prefillCpuLim,
-              simulationTimeout = timeout,
-              cellStateResourcesSorterList = defaultSortingPolicy,
-              cellStateResourcesPickerList = defaultPickingPolicy,
-              powerOnPolicies = defaultPowerOnPolicy,
-              powerOffPolicies = defaultPowerOffPolicy,
-              level1SecurityTimes = security1Range,
-              level2SecurityTimes = security2Range,
-              level3SecurityTimes = security3Range, stackelbergStrategies = stackelbergStrategies)
-
-          //Isolated strategies: cloudlet only
-          allExperiments ::= new Experiment(
-            name = "google-monolithic-%s_path-cloudlet-only"
-              .format(multiOrSingle),
-            workloadToSweepOver = "Service",
-            workloadDescs = workloadGeneratorsIsolatedCloudlet,
-            schedulerWorkloadsToSweepOver = schedulerWorkloadsMap,
-            constantThinkTimeRange = constantRangeEdge,
-            perTaskThinkTimeRange = perTaskRange,
-            blackListPercentRange = (0.0 :: Nil),
-            schedulerWorkloadMap = monolithicSchedulerWorkloadMap,
-            simulatorDesc = monolithicSimulatorDesc,
-            logging = doLogging,
-            outputDirectory = outputDirName,
-            prefillCpuLimits = prefillCpuLim,
-            simulationTimeout = timeout,
-            cellStateResourcesSorterList = defaultSortingPolicy,
-            cellStateResourcesPickerList = defaultPickingPolicy,
-            powerOnPolicies = defaultPowerOnPolicy,
-            powerOffPolicies = defaultPowerOffPolicy,
-            level1SecurityTimes = security1Range,
-            level2SecurityTimes = security2Range,
-            level3SecurityTimes = security3Range, stackelbergStrategies = stackelbergStrategies)
-*/
           //Collaborative experiments - Cloud side
           allExperiments ::= new Experiment(
             name = "google-monolithic-%s_path-collaborative-cloud"

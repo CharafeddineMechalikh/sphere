@@ -27,8 +27,7 @@ object AgnieszkaPicker extends CellStateResourcesPicker{
       val makespanLog = ListBuffer.empty[Double]
       //First approach: Initialization: Iterate over the tasks and choose any machine randomly and then we only apply the crossing thing between ALL machines in cluster.
 
-      //Initialization
-      //var chosenMachines = scala.collection.mutable.ListBuffer.empty[Int]
+      //Initialization 
       var initialMakespan = 0.0
       for(taskID <- 0 until job.numTasks){
         var scheduled = false
@@ -92,22 +91,7 @@ object AgnieszkaPicker extends CellStateResourcesPicker{
         schedule.get(worstParent).get += randomBestTask
         assert(cellState.isMachineOn(bestParent) && cellState.availableCpusPerMachine(bestParent) >= schedule.getOrElse(bestParent, scala.collection.mutable.ListBuffer.empty[Int]).size * job.cpusPerTask + 0.0001 && cellState.availableMemPerMachine(bestParent) >= schedule.getOrElse(bestParent, scala.collection.mutable.ListBuffer.empty[Int]).size * job.memPerTask + 0.0001, "Not enough for bestParent after crossing")
         assert(cellState.isMachineOn(worstParent) && cellState.availableCpusPerMachine(worstParent) >= schedule.getOrElse(worstParent, scala.collection.mutable.ListBuffer.empty[Int]).size * job.cpusPerTask + 0.0001 && cellState.availableMemPerMachine(worstParent) >= schedule.getOrElse(worstParent, scala.collection.mutable.ListBuffer.empty[Int]).size * job.memPerTask + 0.0001, "Not enough for worstParent after crossing")
-        /*var scheduled = false
-               while (!scheduled){
-                 val rnd = new scala.util.Random
-                 val range = 0 until cellState.numMachines
-                 val mID = (range(rnd.nextInt(range length)))
-                 val machineOcurrences = chosenMachines.count(_ == mID)
-                 if (cellState.isMachineOn(mID) && cellState.availableCpusPerMachine(mID) >= (job.cpusPerTask + (machineOcurrences * job.cpusPerTask) + 0.0001) && cellState.availableMemPerMachine(mID) >= (job.memPerTask + (machineOcurrences * job.memPerTask) + 0.0001)) {
-                   assert(cellState.isMachineOn(mID), "Trying to pick a powered off machine with picker : "+name)
-                   chosenMachines -= worstParent
-                   chosenMachines += mID
-                   scheduled = true
-                 }
-                 else{
-                   numTries+=1
-                 }
-               }*/
+         
 
         //Only for testing purposes
         var checkMakespan = 0.0

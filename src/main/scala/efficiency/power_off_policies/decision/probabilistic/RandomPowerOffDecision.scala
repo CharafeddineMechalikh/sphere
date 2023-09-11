@@ -10,7 +10,6 @@ import scala.util.Random
   */
 class RandomPowerOffDecision(threshold: Double = 0.5) extends PowerOffDecision{
    override def shouldPowerOff(cellState: CellState, machineID: Int): Boolean = {
-     //println(("On : %f y ocupadas: %f").format(cellState.numberOfMachinesOn.toDouble/cellState.numMachines, cellState.numMachinesOccupied.toDouble/cellState.numMachines))
      Random.nextFloat() < threshold
    }
 

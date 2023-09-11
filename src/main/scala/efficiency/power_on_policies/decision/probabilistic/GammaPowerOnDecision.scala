@@ -17,7 +17,6 @@ class GammaPowerOnDecision(threshold : Double, windowSize: Int, lostFactor : Dou
     if(jobAttributes._1 > 0.0 && jobAttributes._3 > 0.0 && jobAttributes._5 > 0.0){
       val alphaCpu = (cellState.availableCpus - (cellState.numberOfMachinesOn * cellState.cpusPerMachine * lostFactor)) / jobAttributes._5
       val alphaMem = (cellState.availableMem - (cellState.numberOfMachinesOn * cellState.memPerMachine * lostFactor)) / jobAttributes._3
-      //FIXME: en la implementación anterior teníamos un floor de (alphacpu+alphamem) /2 y le sumábamos 1
       val lastTuple = allPastTuples.maxBy(tuple => tuple._1)
       val prob = getGammaDistributionCummulativeProbability( Math.min(alphaCpu,alphaMem), jobAttributes._1, Math.max(jobAttributes._1+cellState.powerOnTime, cellState.simulator.currentTime - lastTuple._1))
       should = prob > threshold

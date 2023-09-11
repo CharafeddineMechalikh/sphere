@@ -207,13 +207,9 @@ class DynamicScheduler(name: String,
       hashCode(),
       constantThinkTimes.mkString(";"),
       perTaskThinkTimes.mkString(";")))
-  // TODO(andyk): Clean up these <subclass>Simulator classes
-  //              by templatizing the Scheduler class and having only
-  //              one simulator of the correct type, instead of one
-  //              simulator for each of the parent and child classes.
+  
   var dynamicSimulator: DynamicSimulator = null
-  val offerQueue = new collection.mutable.Queue[Offer]
-  //TODO: Inicializar
+  val offerQueue = new collection.mutable.Queue[Offer] 
   var chosenStrategy: RMStrategy = null
   val omegaStrategy: OmegaStrategy = new OmegaStrategy(this)
   val mesosStrategy: MesosStrategy = new MesosStrategy(this)
@@ -252,15 +248,11 @@ class DynamicScheduler(name: String,
     }
     else if(iter%100 == 0){
       if(chosenStrategy.name == "Omega"){
-        chosenStrategy = mesosStrategy
-        //scheduling=false
-        //start();
+        chosenStrategy = mesosStrategy 
       }
       else{
         chosenStrategy.asInstanceOf[MesosStrategy].removeOffers();
-        chosenStrategy = omegaStrategy
-        //scheduling=false
-        //start();
+        chosenStrategy = omegaStrategy 
       }
     }*/
   }

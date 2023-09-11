@@ -21,7 +21,7 @@ class ExponentialPowerOnAction(threshold : Double, windowSize: Int, lostFactor :
       do {
         numMachinesPowerOn += 1
         dangerousPastTuples = allPastTuples.filter(pastTuple => (pastTuple._2.numTasks * pastTuple._2.cpusPerTask > cellState.availableCpus + (cellState.cpusPerMachine * numMachinesPowerOn) - ((cellState.numberOfMachinesOn + numMachinesPowerOn) * cellState.cpusPerMachine * lostFactor)) || (pastTuple._2.numTasks * pastTuple._2.memPerTask > cellState.availableMem + (cellState.memPerMachine * numMachinesPowerOn) - ((cellState.numberOfMachinesOn + numMachinesPowerOn) * cellState.memPerMachine * lostFactor)))
-        //val jobAttributes = getJobAttributes(allPastTuples)
+
         var interArrival = 0.0
         if (dangerousPastTuples.size > 1) {
           interArrival = dangerousPastTuples(0)._1

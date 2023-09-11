@@ -51,8 +51,7 @@ class MonolithicStrategy(sched : DynamicScheduler) extends RMStrategy {
         }
         var jobEventType = "" // Set this conditionally below; used in logging.
         // If the job isn't yet fully scheduled, put it back in the queue.
-        if (job.unscheduledTasks > 0) {
-          //println(("LLega el job %d con %d tareas restantes sin schedulear del total %d").format(job.id, job.unscheduledTasks, job.numTasks))
+        if (job.unscheduledTasks > 0) { 
           scheduler.simulator.log(("Job %s didn't fully schedule, %d / %d tasks remain " +
             "(shape: %f cpus, %f mem). Putting it " +
             "back in the queue").format(job.id,
@@ -76,8 +75,7 @@ class MonolithicStrategy(sched : DynamicScheduler) extends RMStrategy {
               job.numSchedulingAttempts))
             scheduler.numJobsTimedOutScheduling += 1
             jobEventType = "abandoned"
-          } else {
-            //FIXME: Tenemos que tener en cuenta las máquinas que se están encendiendo?
+          } else { 
             if ((scheduler.simulator.cellState.numberOfMachinesOn) < scheduler.simulator.cellState.numMachines) {
               scheduler.recordWastedTimeSchedulingPowering(job, scheduler.simulator.cellState.powerOnTime / 4 + 0.1)
               scheduler.simulator.afterDelay(scheduler.simulator.cellState.powerOnTime / 4 + 0.1) {
@@ -100,14 +98,7 @@ class MonolithicStrategy(sched : DynamicScheduler) extends RMStrategy {
           scheduler.simulator.powerOn.powerOn(scheduler.simulator.cellState, job, "monolithic")
         }
         if (!jobEventType.equals("")) {
-          // println("%s %s %d %s %d %d %f"
-          //         .format(Thread.currentThread().getId(),
-          //                 name,
-          //                 hashCode(),
-          //                 jobEventType,
-          //                 job.id,
-          //                 job.numSchedulingAttempts,
-          //                 simulator.currentTime - job.submitted))
+           
         }
         scheduler.scheduling = false
         scheduleNextJobAction()

@@ -21,8 +21,7 @@ object CrossGenes extends CrossingFunction{
     assert(numTasksC1 == numTasksC2, "Number of tasks not valid")
     var genesToCross = 1 + randomNumberGenerator.nextInt(numTasksC1/2)
     var balance = 0
-    var mIDProcessed = new collection.mutable.ListBuffer[Int]()
-    //var log = new collection.mutable.ListBuffer[String]()
+    var mIDProcessed = new collection.mutable.ListBuffer[Int]() 
     val loop = new Breaks;
     loop.breakable {
       while (genesToCross > 0 || balance != 0) {
@@ -31,16 +30,12 @@ object CrossGenes extends CrossingFunction{
           if (!mIDProcessed.contains(mID)) {
             if (balance == 0 && chromosome1(mID) == 1 && chromosome2(mID) == 1) {
               //If the value of this gene is the same, it remains equal
-              genesToCross -= 1
-              //log += "balance 0 C1 1 los dos 1"
-              //assert(chromosome1.filter(_ == 1).size == chromosome2.filter(_ == 1).size, "Mal en balance 0 C1 1 los dos 1")
+              genesToCross -= 1 
             }
             else if (balance == 0 && chromosome1(mID) == 1 && chromosome2(mID) == 0) {
               //Case: Chromosome 1 loses one tasks, new balance is -1
               chromosome1(mID) = 0
               chromosome2(mID) = 1
-              //log += "balance 0 C1 1 C2 0 con c1" + chromosome1.filter(_ == 1).size + " y c2 " + chromosome2.filter(_ == 1).size
-              //assert(chromosome1.filter(_ == 1).size == (chromosome2.filter(_ == 1).size) - 2, "Mal en balance 0 C1 1 C2 0 con c1 " + chromosome1.filter(_ == 1).size + " y c2 " + chromosome2.filter(_ == 1).size)
               balance -= 1
               genesToCross -= 1
             }
@@ -48,8 +43,6 @@ object CrossGenes extends CrossingFunction{
               //Case: Chromosome 1 gains one tasks, new balance is 1
               chromosome1(mID) = 1
               chromosome2(mID) = 0
-              //log += "balance 0 C2 1 C1 0 con c1 " + chromosome1.filter(_ == 1).size + " y c2 " + chromosome2.filter(_ == 1).size
-              //assert((chromosome1.filter(_ == 1).size) - 2 == chromosome2.filter(_ == 1).size, "Mal en balance 0 C2 1 C1 0 con c1 " + chromosome1.filter(_ == 1).size + " y c2 " + chromosome2.filter(_ == 1).size)
               balance += 1
               genesToCross -= 1
             }
@@ -57,9 +50,7 @@ object CrossGenes extends CrossingFunction{
               //Chromosome 1 has gained 1 task. We must exchange one 1 from the C1 with one 0 from the C2
               //Case: Chromosome 1 loses one tasks, new balance is 0
               chromosome1(mID) = 0
-              chromosome2(mID) = 1
-              //log +=  "balance 1"
-              //assert(chromosome1.filter(_ == 1).size == chromosome2.filter(_ == 1).size, "Mal en balance 1")
+              chromosome2(mID) = 1 
               balance -= 1
               genesToCross -= 1
             }
@@ -67,9 +58,7 @@ object CrossGenes extends CrossingFunction{
               //Chromosome 2 has gained 1 task. We must exchange one 1 from the C2 with one 0 from the C1
               //Case: Chromosome 1 gains one tasks, new balance is 0
               chromosome1(mID) = 1
-              chromosome2(mID) = 0
-              //log +=  "balance -1"
-              //assert(chromosome1.filter(_ == 1).size == chromosome2.filter(_ == 1).size, "Mal en balance -1")
+              chromosome2(mID) = 0 
               balance += 1
               genesToCross -= 1
             }
@@ -91,7 +80,7 @@ object CrossGenes extends CrossingFunction{
   }
 
   override def newCross(chromosome1: HashMap[Int, ListBuffer[Int]], chromosome2: HashMap[Int, ListBuffer[Int]]): (HashMap[Int, ListBuffer[Int]], HashMap[Int, ListBuffer[Int]]) = {
-    //println("Empiezo "+name)
+   
     var numTasksC1 = 0
     for ((machineID,tasksMachine) <- chromosome1){
       numTasksC1 += tasksMachine.size
@@ -100,8 +89,7 @@ object CrossGenes extends CrossingFunction{
     for ((mID,tasksMachine2) <- chromosome2){
       numTasksC2 += tasksMachine2.size
     }
-    //val numTasksC1 = chromosome1.values.map( x => x.size).sum
-    //val numTasksC2 = chromosome2.values.map( x => x.size).sum
+    
     assert(numTasksC1 == numTasksC2, "Number of tasks not valid")
     var genesToCross = randomNumberGenerator.nextInt(numTasksC1/2)
     assert(genesToCross >= 0, "no genes to cross")
@@ -110,7 +98,6 @@ object CrossGenes extends CrossingFunction{
       var mIDProcessed1 = new ListBuffer[Int]()
       var mIDProcessed2 = new ListBuffer[Int]()
 
-      //var log = new collection.mutable.ListBuffer[String]()
       val loop = new Breaks;
       loop.breakable {
         while (genesToCross > 0) {
@@ -154,12 +141,7 @@ object CrossGenes extends CrossingFunction{
           genesToCross -= 1
         }
       }
-    }
-    //val validC1 = chromosome1.values.map( x => x.size).sum == numTasksC1
-    //val validC2 = chromosome2.values.map( x => x.size).sum == numTasksC1
-    //assert(validC1, "Chromosome 1 numTasks not valid in "+name)
-    //assert(validC2, "Chromosome 2 numTasks not valid in "+name)
-    //println("Llego a final de "+name)
+    } 
     (chromosome1, chromosome2)
   }
 

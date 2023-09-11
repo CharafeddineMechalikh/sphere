@@ -10,9 +10,7 @@ trait DistributionUtils {
   def getGammaDistributionCummulativeProbability(alpha: Double, beta: Double, ts: Double): Double ={
     var probability = 0.0
     if(alpha / (ts/beta) <= 10.00){
-      DistributionCache.gammaDistributionCacheCalls += 1
-      //DistributionCache.gammaDistributionCache.getOrElseUpdate((alpha, beta, ts), generateGammaDistributionCummulativeProbability(alpha, beta, ts))
-      //generateGammaDistributionCummulativeProbability(alpha, beta, ts)
+      DistributionCache.gammaDistributionCacheCalls += 1 
       var a = BigDecimal(alpha).setScale(2, BigDecimal.RoundingMode.FLOOR).toDouble
       if(a <= 0.01){
         a = 0.01
@@ -54,9 +52,7 @@ trait DistributionUtils {
   }
 
   /*def getGammaDistributionCummulativeProbability(alpha: Double, beta: Double, ts: Double): Double ={
-    DistributionCache.gammaDistributionCacheCalls += 1
-    //DistributionCache.gammaDistributionCache.getOrElseUpdate((alpha, beta, ts), generateGammaDistributionCummulativeProbability(alpha, beta, ts))
-    //generateGammaDistributionCummulativeProbability(alpha, beta, ts)
+    DistributionCache.gammaDistributionCacheCalls += 1 
     var prob = None : Option[Double]
     if(DistributionCache.gammaDistributionCache.get(("%.1f".format(alpha).toDouble, "%.4f".format(alpha).toDouble, ts)) == null){
       prob = Some(generateGammaDistributionCummulativeProbability("%.1f".format(alpha).toDouble, "%.4f".format(alpha).toDouble, ts))
@@ -80,18 +76,7 @@ trait DistributionUtils {
 
 
   def getPastTuples(cellState: CellState, windowSize: Int): Seq[Tuple2[Double, Job]] ={
-    /*var allPastTuples = Seq[Tuple2[Double, Job]]()
-    cellState.simulator.schedulers.map(_._2).foreach(_.cleanPastJobs(windowSize+1))
-    var pastJobsMaps = Map[Long, Tuple2[Double, Job]]()
-    for (mapElement <- cellState.simulator.schedulers.map(_._2).map(_.pastJobs)){
-      pastJobsMaps = pastJobsMaps ++ mapElement
-    }
-    allPastTuples = allPastTuples ++ pastJobsMaps.map(_._2).toSeq
-    allPastTuples = allPastTuples.sortBy(_._1)
-    if(allPastTuples.length >= windowSize+1){
-      allPastTuples = allPastTuples.slice(allPastTuples.length-(windowSize+2), allPastTuples.length-1)
-    }
-    allPastTuples*/
+  
     val jobCacheLength = cellState.simulator.jobCache.length
     if(jobCacheLength > windowSize+1){
       cellState.simulator.jobCache.slice(jobCacheLength-(windowSize+1), jobCacheLength)
@@ -115,17 +100,14 @@ trait DistributionUtils {
         }
       }
     }
-    //cellState.simulator.jobCache.filter( tuple => tuple._1 > cellState.simulator.currentTime - timeWindow)
-    //val numElements = cellState.simulator.jobCache.count(tuple => tuple._1 > cellState.simulator.currentTime - timeWindow)
-    //cellState.simulator.jobCache.takeRight(numElements)
+   
     cellState.simulator.jobCache.slice(jobCacheLength-(numElements+1), jobCacheLength)
   }
 
   def getJobAttributes(pastTuples : Seq[Tuple2[Double, Job]]): Tuple10[Double, Double, Double, Double, Double, Double, Double, Double, Double, Double] ={
     DistributionCache.jobAttributesCacheCalls += 1
     val jobId = pastTuples.map(_._2).map(_.id)
-    //DistributionCache.jobAttributesCache.getOrElseUpdate(pastTuples.map(_._2).map(_.id),generateJobAtributes(pastTuples))
-    //generateJobAtributes(pastTuples)
+   
     var jobAttrs = DistributionCache.jobAttributesCache.get(jobId)
     if(jobAttrs == null){
       jobAttrs = generateJobAtributes(pastTuples)
@@ -192,9 +174,7 @@ trait DistributionUtils {
 
   def getNormalDistributionInverseCummulativeProbability(normalAvg: Double, normalStdDev: Double, normalThreshold: Double): Double ={
     DistributionCache.normalDistributionCacheCalls += 1
-    //DistributionCache.normalDistributionCache.getOrElseUpdate((normalAvg, normalStdDev, normalThreshold), generateNormalDistributionInverseCummulativeProbability(normalAvg, normalStdDev, normalThreshold))
-    //generateNormalDistributionInverseCummulativeProbability(normalAvg, normalStdDev, normalThreshold)
-    val av = BigDecimal(normalAvg).setScale(4, BigDecimal.RoundingMode.FLOOR).toDouble
+       val av = BigDecimal(normalAvg).setScale(4, BigDecimal.RoundingMode.FLOOR).toDouble
     val ns = BigDecimal(normalStdDev).setScale(4, BigDecimal.RoundingMode.FLOOR).toDouble
     var prob = DistributionCache.normalDistributionCache.get((av, ns, normalThreshold))
     if(prob == 0.0){
@@ -204,18 +184,7 @@ trait DistributionUtils {
     prob
   }
 
-  /*def getNormalDistributionInverseCummulativeProbability(normalAvg: Double, normalStdDev: Double, normalThreshold: Double): Double ={
-
-    DistributionCache.normalDistributionCacheCalls += 1
-    //DistributionCache.normalDistributionCache.getOrElseUpdate((normalAvg, normalStdDev, normalThreshold), generateNormalDistributionInverseCummulativeProbability(normalAvg, normalStdDev, normalThreshold))
-    //generateNormalDistributionInverseCummulativeProbability(normalAvg, normalStdDev, normalThreshold)
-    var prob = DistributionCache.normalDistributionCache.get(("%.4f".format(normalAvg).toDouble, "%.4f".format(normalStdDev).toDouble, normalThreshold))
-    if(prob == 0.0){
-      prob = generateNormalDistributionInverseCummulativeProbability("%.4f".format(normalAvg).toDouble, "%.4f".format(normalStdDev).toDouble, normalThreshold)
-      DistributionCache.normalDistributionCache.put(("%.4f".format(normalAvg).toDouble, "%.4f".format(normalStdDev).toDouble, normalThreshold), prob)
-    }
-    prob
-  }*/
+  
 
   def generateNormalDistributionInverseCummulativeProbability(normalAvg: Double, normalStdDev: Double, normalThreshold: Double): Double ={
     DistributionCache.normalDistributionCacheMiss += 1

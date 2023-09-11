@@ -190,10 +190,7 @@ class OmegaScheduler(name: String,
       hashCode(),
       constantThinkTimes.mkString(";"),
       perTaskThinkTimes.mkString(";")))
-  // TODO(andyk): Clean up these <subclass>Simulator classes
-  //              by templatizing the Scheduler class and having only
-  //              one simulator of the correct type, instead of one
-  //              simulator for each of the parent and child classes.
+  
   var omegaSimulator: OmegaSimulator = null
   var privateCellState: CellState = null
 
@@ -243,8 +240,7 @@ class OmegaScheduler(name: String,
       job.numTaskSchedulingAttempts += job.unscheduledTasks
       // Schedule the job in private cellstate.
       assert(job.unscheduledTasks > 0)
-      val claimDeltas = scheduleJob(job, privateCellState)
-      // TODO : No puedo usar Commit result, así que...
+      val claimDeltas = scheduleJob(job, privateCellState) 
       var commitedDelta = Seq[ClaimDelta]()
       var conflictedDelta = Seq[ClaimDelta]()
       simulator.log(("Job %d (%s) finished %f seconds of scheduling " +
@@ -281,17 +277,11 @@ class OmegaScheduler(name: String,
             job.numSchedulingAttempts == 1)
         } else {
           numFailedTransactions += 1
-          incrementDailycounter(dailyFailedTransactions)
-          // omegaSimulator.log("adding %f seconds to wastedThinkTime counter."
-          //                   .format(jobThinkTime))
+          incrementDailycounter(dailyFailedTransactions) 
           recordWastedTimeScheduling(job,
             jobThinkTime,
             job.numSchedulingAttempts == 1)
-          // omegaSimulator.log(("Transaction task CONFLICTED for job-%d on " +
-          //                     "machines %s.")
-          //                    .format(job.id,
-          //                            commitResult.conflictedDeltas.map(_.machineID)
-          //                            .mkString(", ")))
+         
         }
       } else {
         simulator.log(("Not enough resources of the right shape were " +
@@ -337,20 +327,12 @@ class OmegaScheduler(name: String,
       } else {
         // All tasks in job scheduled so don't put it back in pendingQueue.
         jobEventType = "fully-scheduled"
-      }
-      //TODO: Buen sitio para la lógica de encender
+      } 
       if(omegaSimulator.cellState.numberOfMachinesOn < omegaSimulator.cellState.numMachines){
         simulator.powerOn.powerOn(omegaSimulator.cellState, job, "omega", commitedDelta, conflictedDelta)
       }
       if (!jobEventType.equals("")) {
-        // println("%s %s %d %s %d %d %f"
-        //         .format(Thread.currentThread().getId(),
-        //                 name,
-        //                 hashCode(),
-        //                 jobEventType,
-        //                 job.id,
-        //                 job.numSchedulingAttempts,
-        //                 simulator.currentTime - job.submitted))
+       
       }
 
       omegaSimulator.log("Set " + name + " scheduling to FALSE")
@@ -366,8 +348,6 @@ class OmegaScheduler(name: String,
   def syncCellState {
     checkRegistered
     privateCellState = omegaSimulator.cellState.copy
-    simulator.log("%s synced private cellstate.".format(name))
-    // println("Scheduler %s (%d) has new private cell state %d"
-    //         .format(name, hashCode, privateCellState.hashCode))
+    simulator.log("%s synced private cellstate.".format(name)) 
   }
 }

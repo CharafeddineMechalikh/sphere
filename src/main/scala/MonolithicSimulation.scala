@@ -190,8 +190,7 @@ class MonolithicScheduler(name: String,
         }
         var jobEventType = "" // Set this conditionally below; used in logging.
         // If the job isn't yet fully scheduled, put it back in the queue.
-        if (job.unscheduledTasks > 0) {
-          //println(("LLega el job %d con %d tareas restantes sin schedulear del total %d").format(job.id, job.unscheduledTasks, job.numTasks))
+        if (job.unscheduledTasks > 0) { 
           simulator.log(("Job %s didn't fully schedule, %d / %d tasks remain " +
             "(shape: %f cpus, %f mem). Putting it " +
             "back in the queue").format(job.id,
@@ -215,8 +214,7 @@ class MonolithicScheduler(name: String,
               job.numSchedulingAttempts))
             numJobsTimedOutScheduling += 1
             jobEventType = "abandoned"
-          } else {
-            //FIXME: Tenemos que tener en cuenta las máquinas que se están encendiendo?
+          } else { 
             if((simulator.cellState.numberOfMachinesOn) < simulator.cellState.numMachines){
               recordWastedTimeSchedulingPowering(job, simulator.cellState.powerOnTime/4+0.1)
               simulator.afterDelay(simulator.cellState.powerOnTime/4+0.1) {
@@ -232,21 +230,13 @@ class MonolithicScheduler(name: String,
         } else {
           // All tasks in job scheduled so don't put it back in pendingQueue.
           jobEventType = "fully-scheduled"
-        }
-        //TODO: Stackelberg
+        } 
         simulator.stackelberg.play(claimDeltas,simulator.cellState,job,this,simulator)
         if(simulator.cellState.numberOfMachinesOn < simulator.cellState.numMachines){
           simulator.powerOn.powerOn(simulator.cellState, job, "monolithic")
         }
         if (!jobEventType.equals("")) {
-          // println("%s %s %d %s %d %d %f"
-          //         .format(Thread.currentThread().getId(),
-          //                 name,
-          //                 hashCode(),
-          //                 jobEventType,
-          //                 job.id,
-          //                 job.numSchedulingAttempts,
-          //                 simulator.currentTime - job.submitted))
+          
         }
 
         scheduling = false

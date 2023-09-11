@@ -23,8 +23,7 @@ class GammaNormalPowerOnAction(normalThreshold: Double, threshold : Double, wind
         val alphaMem = (cellState.availableMem + (cellState.memPerMachine * numMachinesPowerOn) - ((cellState.numberOfMachinesOn + numMachinesPowerOn) * cellState.memPerMachine * lostFactor)) / Math.max(0.01, getNormalDistributionInverseCummulativeProbability(jobAttributes._3, jobAttributes._4, normalThreshold))
         var beta = getNormalDistributionInverseCummulativeProbability(jobAttributes._1, jobAttributes._2, 1-normalThreshold)
         if (beta < 0 )
-          beta = 0.1
-        //FIXME: en la implementación anterior teníamos un floor de (alphacpu+alphamem) /2 y le sumábamos 1
+          beta = 0.1 
         if(alphaCpu > 0.0 || alphaMem > 0.0) {
           val lastTuple = allPastTuples.maxBy(tuple => tuple._1)
           val prob = getGammaDistributionCummulativeProbability( Math.min(alphaCpu,alphaMem), beta, Math.max(jobAttributes._1+cellState.powerOnTime, cellState.simulator.currentTime - lastTuple._1))

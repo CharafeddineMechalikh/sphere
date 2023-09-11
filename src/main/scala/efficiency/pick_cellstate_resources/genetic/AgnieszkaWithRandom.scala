@@ -16,8 +16,7 @@ object AgnieszkaWithRandom extends CellStateResourcesPicker{
 
   override def schedule(cellState: CellState, job: Job, scheduler: Scheduler, simulator: ClusterSimulator): ListBuffer[ClaimDelta] = {
     //For batch jobs, this picker tries to minimize the makespan. Otherwise, random.
-    if(job.workloadName == "Batch"){
-      //Schedule: Machine ID -> [Task ID1, Task ID2,...]
+    if(job.workloadName == "Batch"){ 
       val schedule = collection.mutable.HashMap.empty[Int, collection.mutable.ListBuffer[Int]]
       val claimDeltas = collection.mutable.ListBuffer[ClaimDelta]()
       var candidatePool = scheduler.candidatePoolCache.getOrElseUpdate(cellState.numberOfMachinesOn, Array.range(0, cellState.numMachines))
@@ -27,8 +26,7 @@ object AgnieszkaWithRandom extends CellStateResourcesPicker{
       val makespanLog = scala.collection.mutable.ListBuffer.empty[Double]
       //First approach: Initialization: Iterate over the tasks and choose any machine randomly and then we only apply the crossing thing between ALL machines in cluster.
 
-      //Initialization
-      //var chosenMachines = scala.collection.mutable.ListBuffer.empty[Int]
+      //Initialization 
       var initialMakespan = 0.0
       for(taskID <- 0 until job.numTasks){
         var scheduled = false

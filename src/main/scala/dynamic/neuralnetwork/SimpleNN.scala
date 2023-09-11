@@ -25,8 +25,7 @@ object SimpleNN {
   def classify(utilization: Double, interArrival: Double): String = {
     //Normalization, not the minimum code, but understandable
     var util = utilization
-    var inter = interArrival
-    //println(util + " " + inter)
+    var inter = interArrival 
     if(utilization < minUtilization){
       util = minUtilization
     }

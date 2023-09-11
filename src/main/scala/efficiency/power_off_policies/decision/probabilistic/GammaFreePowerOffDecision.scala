@@ -9,8 +9,6 @@ import org.apache.commons.math.distribution.GammaDistributionImpl
   */
 class GammaFreePowerOffDecision(threshold : Double, windowSize: Int) extends PowerOffDecision{
   override def shouldPowerOff(cellState: CellState, machineID: Int): Boolean = {
-    //FIXME: Esto no calcula bien
-    //TODO: Calculate Ts
     val ts = 130.0
     var should = false
     var interArrivalAvg = 0.0
@@ -37,8 +35,7 @@ class GammaFreePowerOffDecision(threshold : Double, windowSize: Int) extends Pow
       interArrival = interArrival :+ (allPastTuples(i)._1 - allPastTuples(i-1)._1)
       memConsumed = memConsumed :+ allPastTuples(i)._2.numTasks*allPastTuples(i)._2.memPerTask
       cpuConsumed = cpuConsumed :+ allPastTuples(i)._2.numTasks*allPastTuples(i)._2.cpusPerTask
-      //FIXME: No deberíamos usar allPastTuples(i)._2.taskDuration porque en la realidad no funciona así. Si esto funciona bien, modelar una normal
-      if(allPastTuples(i)._2.unscheduledTasks > 0 && (allPastTuples(i)._2.lastSchedulingStartTime + allPastTuples(i)._2.taskDuration <= cellState.simulator.currentTime + ts)) {
+        if(allPastTuples(i)._2.unscheduledTasks > 0 && (allPastTuples(i)._2.lastSchedulingStartTime + allPastTuples(i)._2.taskDuration <= cellState.simulator.currentTime + ts)) {
         cpuFree += allPastTuples(i)._2.numTasks * allPastTuples(i)._2.cpusPerTask
         memFree += allPastTuples(i)._2.numTasks * allPastTuples(i)._2.memPerTask
       }

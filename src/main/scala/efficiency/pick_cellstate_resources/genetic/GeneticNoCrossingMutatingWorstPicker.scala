@@ -10,7 +10,6 @@ import scala.util.control.Breaks
  * Created by dfernandez on 11/1/16.
  */
 // This picker doesn't take into account yet shutted down machines nor capacity security margins nor performance
-// TODO: Make a Quicksort-like strategy or pass a candidate index to iterate (e.g. the last successful candidate)
 object GeneticNoCrossingMutatingWorstPicker extends CellStateResourcesPicker{
   val randomNumberGenerator = new util.Random(Seed())
 

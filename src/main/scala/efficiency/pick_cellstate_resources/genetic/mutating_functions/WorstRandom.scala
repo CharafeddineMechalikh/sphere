@@ -40,8 +40,6 @@ object WorstRandom extends MutatingFunction{
 
   override def newMutate(chromosome: HashMap[Int, ListBuffer[Int]], mutationProbability: Double, cellState: CellState, job : Job): HashMap[Int, ListBuffer[Int]] = {
     assert(mutationProbability >= 0.0 && mutationProbability <= 1.0, "Mutation probability not valid")
-    //val tasks = chromosome.values.map( x => x.size).sum
-    //println("Empiezo "+name)
 
     var tasks = 0
     for ((machineID,tasksMachine) <- chromosome){
@@ -78,13 +76,11 @@ object WorstRandom extends MutatingFunction{
         }
       }
     }
-    //val newTasks= mutatedChromosome.values.map( x => x.size).sum
     var newTasks = 0
     for ((mID,newTasksMachine) <- mutatedChromosome){
       newTasks += newTasksMachine.size
     }
     assert(newTasks == tasks, "Tasks number changed in mutation in "+name+". Former was: "+tasks+" and chromosome: "+chromosome.toString+" and new is: "+newTasks+" in: "+name+" and chromosome: "+mutatedChromosome.toString())
-    //println("Llego al final de "+name)
     mutatedChromosome
   }
 

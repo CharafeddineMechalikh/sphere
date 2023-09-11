@@ -195,11 +195,7 @@ class MesosScheduler (name: String,
       hashCode(),
       constantThinkTimes.mkString(";"),
       perTaskThinkTimes.mkString(";")))
-  // TODO(andyk): Clean up these <subclass>Simulator classes
-  //              by templatizing the Scheduler class and having only
-  //              one simulator of the correct type, instead of one
-  //              simulator for each of the parent and child classes.
-  var mesosSimulator: MesosSimulator = null
+  
   val offerQueue = new collection.mutable.Queue[Offer]
 
   override
@@ -234,10 +230,7 @@ class MesosScheduler (name: String,
       val offerResponse = collection.mutable.ListBuffer[ClaimDelta]()
       var aggThinkTime: Double = 0.0
       var lastJobScheduled : Option[Job] = None
-      // TODO(andyk): add an efficient method to CellState that allows us to
-      //              check the largest slice of available resources to decode
-      //              if we should keep trying to schedule or not.
-      while (offer.cellState.availableCpus > 0.000001 &&
+     
         offer.cellState.availableMem > 0.000001 &&
         !pendingQueue.isEmpty) {
         val job = pendingQueue.dequeue
@@ -319,7 +312,7 @@ class MesosScheduler (name: String,
             numJobsTimedOutScheduling += 1
             jobEventType = "abandoned"
           } else {
-            //FIXME: Tenemos que tener en cuenta las máquinas que se están encendiendo?
+            
             if((simulator.cellState.numberOfMachinesOn) < simulator.cellState.numMachines){
               recordWastedTimeSchedulingPowering(job, simulator.cellState.powerOnTime/4+0.1)
               simulator.afterDelay(simulator.cellState.powerOnTime/4+0.1) {
@@ -338,16 +331,7 @@ class MesosScheduler (name: String,
           jobEventType = "fully-scheduled"
         }
         if (!jobEventType.equals("")) {
-          // Print some stats that we can use to generate CDFs of the job
-          // # scheduling attempts and job-time-till-scheduled.
-          // println("%s %s %d %s %d %d %f"
-          //         .format(Thread.currentThread().getId(),
-          //                 name,
-          //                 hashCode(),
-          //                 jobEventType,
-          //                 job.id,
-          //                 job.numSchedulingAttempts,
-          //                 simulator.currentTime - job.submitted))
+        
         }
       }
 
@@ -567,16 +551,7 @@ class MesosAllocator(constantThinkTime: Double,
             simulator.cellState.availableCpus,
             minCpuOffer,
             minMemOffer)
-        //TODO: Decidir si prescindir de esto o no. Sólo sirve para el caso en el que se encuentre todas las máquinas apagadas
-        /*if(simulator.cellState.numberOfMachinesOn < simulator.cellState.numMachines){
-          if(!schedulersRequestingResources.isEmpty){
-            val nextScheduler = drfSortSchedulers(schedulersRequestingResources.toSeq)(0)
-            simulator.powerOn.powerOn(simulator.cellState, nextScheduler.nextJob(), "mesos")
-          }
-          else{
-            simulator.powerOn.powerOn(simulator.cellState, null, "mesos")
-          }
-        }*/
+       
       }
       simulator.log("Not sending an offer after all. %s".format(reason))
     }
@@ -640,7 +615,6 @@ class MesosAllocator(constantThinkTime: Double,
         }
       })
     }
-    //TODO: Buen sitio para la lógica de encender
     if(simulator.cellState.numberOfMachinesOn < simulator.cellState.numMachines){
       simulator.powerOn.powerOn(simulator.cellState, requestJob, "mesos")
     }

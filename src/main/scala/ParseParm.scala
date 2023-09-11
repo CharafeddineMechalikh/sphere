@@ -155,7 +155,6 @@ class ParseParms(val help: String) {
     }
 
     private def mergeParms( args: Map[String,String] ) = {
-        //val mergedMap = collection.mutable.Map[String,String]()
         var mergedMap = Map[String,String]()    // name value Map of results
         for{ (key,value) <- parms               // iterate through parms
             //mValue = if( args.contains(key) ) args(key) else value(0)
@@ -181,27 +180,4 @@ class ParseParms(val help: String) {
     }
 }
 
-// object Main {
-// 
-//   /**
-//    * @param args the command line arguments
-//    */
-//   def main(args: Array[String]) = {
-//     val helpString = " -p1 out.txt -p2 22 [ -p3 100 -p4 1200 ] "
-//     val pp = new ParseParms( helpString )
-//     pp.parm("-p1", "output.txt").rex("^.*\\.txt$").req(true)    // required
-//       .parm("-p2", "22","^\\d{2}$",true)        // alternate form, required
-//       .parm("-p3","100").rex("^\\d{3}$")                        // optional
-//       .parm("-p4","1200").rex("^\\d{4}$").req(false)            // optional
-// 
-//     val result = pp.validate( args.toList )
-//     println(  if( result._1 ) result._3  else result._2 )
-//     // result is a tuple (Boolean, String, Map)
-//     // ._1 Boolean; false: error String contained in ._2, Map in ._3 is empty
-//     //              true:  successful, Map of parsed & merged parms in ._3
-// 
-//     System.exit(0)
-//   }
-// 
-// }
 

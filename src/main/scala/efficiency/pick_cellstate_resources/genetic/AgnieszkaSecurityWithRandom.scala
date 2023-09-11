@@ -20,8 +20,7 @@ object AgnieszkaSecurityWithRandom extends CellStateResourcesPicker{
   override def schedule(cellState: CellState, job: Job, scheduler: Scheduler, simulator: ClusterSimulator): ListBuffer[ClaimDelta] = {
     //For batch jobs, this picker tries to minimize the makespan. Otherwise, random.
     if(job.workloadName == "Batch"){
-      //println("Entra en schedule")
-      //Schedule: Machine ID -> [Task ID1, Task ID2,...]
+     
       val schedule = collection.mutable.HashMap.empty[Int, collection.mutable.ListBuffer[Int]]
       val claimDeltas = collection.mutable.ListBuffer[ClaimDelta]()
       var candidatePool = scheduler.candidatePoolCache.getOrElseUpdate(cellState.numberOfMachinesOn, Array.range(0, cellState.numMachines))
@@ -30,20 +29,10 @@ object AgnieszkaSecurityWithRandom extends CellStateResourcesPicker{
       var numTries =0
       val maxTries = 50
       val makespanLog = scala.collection.mutable.ListBuffer.empty[Double]
-      /*var securityTime = 0.0
-      if(job.security == 1) {
-        securityTime = simulator.securityLevel1Time
-      }
-      if(job.security == 2) {
-        securityTime = simulator.securityLevel2Time
-      }
-      else if(job.security == 3){
-        securityTime = simulator.securityLevel3Time
-      }*/
+
       //First approach: Initialization: Iterate over the tasks and choose any machine randomly and then we only apply the crossing thing between ALL machines in cluster.
       var stop = false
-      //Initialization
-      //var chosenMachines = scala.collection.mutable.ListBuffer.empty[Int]
+      //Initialization 
       var initialMakespan = 0.0
       val loop = new Breaks;
       loop.breakable {
@@ -93,8 +82,7 @@ object AgnieszkaSecurityWithRandom extends CellStateResourcesPicker{
         }
       }
       if(schedule.size > 0) {
-        assert(schedule.size > 0, "Empty schedule")
-        //if(!stop){
+        assert(schedule.size > 0, "Empty schedule") 
         makespanLog += initialMakespan
         //After this, we should have an array of machines that will host our tasks. We will then cross the worst machine with a random one
         for (epoch <- 0 until 40) {
@@ -221,8 +209,7 @@ object AgnieszkaSecurityWithRandom extends CellStateResourcesPicker{
           makespanLog += checkMakespan
           //End of testing purposes
         }
-      }
-      //if(!stop){
+      } 
       for ((machineID,tasksMachine) <- schedule){
         var securityTime = 0.0
         if(cellState.machinesSecurity(machineID) == 1)
@@ -244,12 +231,9 @@ object AgnieszkaSecurityWithRandom extends CellStateResourcesPicker{
           claimDelta.apply(cellState = cellState, locked = false)
           claimDeltas += claimDelta
         }
-      }
-      //}
-      //}
+      } 
       //At the end of the epochs, we return de applied scheduling
-      job.makespanLogArray += makespanLog
-      //println("Sale de schedule")
+      job.makespanLogArray += makespanLog 
       claimDeltas
     }
     else{
@@ -264,8 +248,7 @@ object AgnieszkaSecurityWithRandom extends CellStateResourcesPicker{
     var remainingCandidatesVar= cellState.numMachines
     val loop = new Breaks;
     loop.breakable {
-      for(i <- remainingCandidatesVar-1 to 0 by -1){
-        //FIXME: Putting a security margin of 0.01 because mesos is causing conflicts
+      for(i <- remainingCandidatesVar-1 to 0 by -1){ 
         val mID = cellState.machinesLoad(i)
         val availableCpus = cellState.availableCpusPerMachine(mID)
         val availableMem = cellState.availableMemPerMachine(mID)

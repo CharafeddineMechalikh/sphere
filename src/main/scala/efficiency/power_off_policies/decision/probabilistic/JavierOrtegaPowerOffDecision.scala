@@ -11,10 +11,7 @@ import efficiency.power_off_policies.decision.PowerOffDecision
 class JavierOrtegaPowerOffDecision(threshold : Double, windowSize: Int, ts : Double = 30.0, numSimulations : Int) extends PowerOffDecision with DistributionUtils{
 
   override def shouldPowerOff(cellState: CellState, machineID: Int): Boolean = {
-    //println(("On : %f y ocupadas: %f").format(cellState.numberOfMachinesOn.toDouble/cellState.numMachines, cellState.numMachinesOccupied.toDouble/cellState.numMachines))
-    //FIXME: Esto no calcula bien
-    //TODO: Calculate Ts
-    val allPastTuples = getPastTuples(cellState, windowSize)
+      val allPastTuples = getPastTuples(cellState, windowSize)
     var should = false
     val jobAttributes = getJobAttributes(allPastTuples)
     var results = Array.fill(numSimulations){false}
